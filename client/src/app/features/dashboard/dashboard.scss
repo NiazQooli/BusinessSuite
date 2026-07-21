@@ -1,0 +1,40 @@
+.page__header h1 {
+  margin: 0 0 0.35rem;
+  font-size: 1.85rem;
+  letter-spacing: -0.02em;
+}
+
+.page__header p {
+  margin: 0 0 1.5rem;
+  color: #516574;
+}
+
+.metric {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  min-width: 180px;
+  padding: 1.25rem 1.4rem;
+  border-radius: 0.9rem;
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid rgba(28, 43, 54, 0.08);
+}
+
+.metric__label {
+  font-size: 0.85rem;
+  color: #516574;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.metric__value {
+  font-size: 2rem;
+}
+
+.muted {
+  color: #516574;
+}
+
+.error {
+  color: #8a2f2f;
+}

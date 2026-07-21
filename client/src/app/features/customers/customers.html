@@ -1,0 +1,71 @@
+<section class="page">
+  <header class="page__header">
+    <div>
+      <h1>Customers</h1>
+      <p>{{ totalCount() }} total records</p>
+    </div>
+    <input
+      class="search"
+      type="search"
+      placeholder="Search customers"
+      [ngModel]="search()"
+      (ngModelChange)="onSearch($event)"
+    />
+  </header>
+
+  <form class="create" (ngSubmit)="createCustomer()">
+    <h2>Add customer</h2>
+    <div class="create__grid">
+      <input [(ngModel)]="name" name="name" placeholder="Name" required />
+      <input [(ngModel)]="email" name="email" type="email" placeholder="Email" required />
+      <input [(ngModel)]="phone" name="phone" placeholder="Phone" />
+      <input [(ngModel)]="companyName" name="companyName" placeholder="Company" />
+      <button type="submit">Create</button>
+    </div>
+  </form>
+
+  @if (error()) {
+    <p class="error">{{ error() }}</p>
+  }
+
+  @if (loading()) {
+    <p class="muted">Loading customers…</p>
+  } @else {
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Company</th>
+            <th>Status</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (customer of customers(); track customer.id) {
+            <tr>
+              <td>{{ customer.name }}</td>
+              <td>{{ customer.email }}</td>
+              <td>{{ customer.companyName || '—' }}</td>
+              <td>
+                <span [class.active]="customer.isActive" [class.inactive]="!customer.isActive">
+                  {{ customer.isActive ? 'Active' : 'Inactive' }}
+                </span>
+              </td>
+              <td>
+                <button type="button" class="danger" (click)="deleteCustomer(customer.id)">
+                  Delete
+                </button>
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="5">No customers found.</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</section>
