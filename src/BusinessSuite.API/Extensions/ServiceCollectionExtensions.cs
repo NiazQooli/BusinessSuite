@@ -12,9 +12,24 @@ public static class ServiceCollectionExtensions
         {
             options.SwaggerDoc("v1", new Microsoft.OpenApi.OpenApiInfo
             {
-                Title = "BusinessSuite API",
+                Title = "Fresher Essential API",
                 Version = "v1",
-                Description = "BusinessSuite REST API built with Clean Architecture"
+                Description = "Fresher Essential REST API built with Clean Architecture"
+            });
+
+            options.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.OpenApiSecurityScheme
+            {
+                Name = "Authorization",
+                Type = Microsoft.OpenApi.SecuritySchemeType.Http,
+                Scheme = "bearer",
+                BearerFormat = "JWT",
+                In = Microsoft.OpenApi.ParameterLocation.Header,
+                Description = "Paste JWT access token"
+            });
+
+            options.AddSecurityRequirement(_ => new Microsoft.OpenApi.OpenApiSecurityRequirement
+            {
+                [new Microsoft.OpenApi.OpenApiSecuritySchemeReference("Bearer")] = []
             });
         });
 

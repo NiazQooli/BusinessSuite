@@ -33,13 +33,14 @@ try
         app.UseSwagger();
         app.UseSwaggerUI(options =>
         {
-            options.SwaggerEndpoint("/swagger/v1/swagger.json", "BusinessSuite API v1");
+            options.SwaggerEndpoint("/swagger/v1/swagger.json", "Fresher Essential API v1");
             options.RoutePrefix = string.Empty;
         });
     }
 
     app.UseHttpsRedirection();
     app.UseCors("AngularClient");
+    app.UseAuthentication();
     app.UseAuthorization();
     app.MapControllers();
     app.MapHealthChecks("/health");

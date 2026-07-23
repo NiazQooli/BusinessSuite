@@ -2,67 +2,86 @@
   display: grid;
   grid-template-columns: 240px 1fr;
   min-height: 100vh;
-  background: linear-gradient(160deg, #f3f6f8 0%, #e8eef2 55%, #f7f4ef 100%);
-  color: #1c2b36;
-  font-family: "Segoe UI", "Helvetica Neue", sans-serif;
+  background:
+    radial-gradient(ellipse at top left, rgba(255, 140, 0, 0.12), transparent 45%),
+    linear-gradient(165deg, #0a0a0a 0%, #121212 50%, #0d0d0d 100%);
+  color: var(--fresher-white);
+  font-family: var(--fresher-font);
 }
 
 .shell__sidebar {
-  padding: 1.5rem 1.25rem;
-  background: #13232e;
-  color: #edf3f7;
+  padding: 1.35rem 1.1rem;
+  background: #050505;
+  border-right: 1px solid rgba(255, 255, 255, 0.08);
+  color: #f5f5f5;
   display: flex;
   flex-direction: column;
-  gap: 2rem;
+  gap: 1.75rem;
 }
 
 .shell__brand {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 0.85rem;
+  justify-content: center;
+  gap: 0.35rem;
+  padding: 0.35rem 0.25rem 0.5rem;
 }
 
 .shell__logo {
-  width: 2.5rem;
-  height: 2.5rem;
-  border-radius: 0.65rem;
-  display: grid;
-  place-items: center;
-  background: #2f6f7e;
-  font-weight: 700;
-  letter-spacing: 0.04em;
+  width: min(100%, 9.5rem);
+  height: auto;
+  display: block;
+  background: transparent;
 }
 
-.shell__title {
+.shell__product {
   margin: 0;
-  font-size: 1.05rem;
-  font-weight: 650;
-}
-
-.shell__subtitle {
-  margin: 0.15rem 0 0;
-  font-size: 0.8rem;
-  opacity: 0.7;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.78);
+  text-indent: 0.24em;
 }
 
 .shell__nav {
   display: flex;
   flex-direction: column;
   gap: 0.35rem;
+  flex: 1;
 }
 
-.shell__nav a {
+.shell__nav a,
+.shell__logout {
   color: inherit;
   text-decoration: none;
-  padding: 0.7rem 0.85rem;
-  border-radius: 0.55rem;
-  opacity: 0.85;
-  transition: background 160ms ease, opacity 160ms ease;
+  padding: 0.75rem 0.95rem;
+  border-radius: 999px;
+  opacity: 0.82;
+  font-weight: 650;
+  transition:
+    background 160ms ease,
+    opacity 160ms ease,
+    color 160ms ease;
 }
 
 .shell__nav a:hover,
 .shell__nav a.is-active {
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(255, 140, 0, 0.16);
+  color: var(--fresher-orange-soft);
+  opacity: 1;
+}
+
+.shell__logout {
+  margin-top: auto;
+  text-align: center;
+  border: 1.5px solid rgba(255, 255, 255, 0.14);
+}
+
+.shell__logout:hover {
+  border-color: var(--fresher-orange);
+  color: var(--fresher-orange);
   opacity: 1;
 }
 
@@ -82,5 +101,9 @@
   .shell__nav {
     flex-direction: row;
     flex-wrap: wrap;
+  }
+
+  .shell__logout {
+    margin-top: 0;
   }
 }

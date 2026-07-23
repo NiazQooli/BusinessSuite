@@ -18,6 +18,8 @@ public class ApplicationDbContext : DbContext, IApplicationDbContext
     }
 
     public DbSet<Customer> Customers => Set<Customer>();
+    public DbSet<User> Users => Set<User>();
+    public DbSet<AdmUser> AdmUsers => Set<AdmUser>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

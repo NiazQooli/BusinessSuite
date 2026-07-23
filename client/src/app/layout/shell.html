@@ -1,17 +1,16 @@
 <div class="shell">
   <aside class="shell__sidebar">
     <div class="shell__brand">
-      <span class="shell__logo">BS</span>
-      <div>
-        <p class="shell__title">BusinessSuite</p>
-        <p class="shell__subtitle">Operations</p>
-      </div>
+      <img class="shell__logo" src="/brand/fresher-logo.png" width="140" height="46" alt="Fresher" />
+      <p class="shell__product">Essential</p>
     </div>
 
     <nav class="shell__nav">
       <a routerLink="/dashboard" routerLinkActive="is-active">Dashboard</a>
       <a routerLink="/customers" routerLinkActive="is-active">Customers</a>
     </nav>
+
+    <a class="shell__logout" routerLink="/login" (click)="signOut()">Sign out</a>
   </aside>
 
   <main class="shell__content">

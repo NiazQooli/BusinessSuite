@@ -1,5 +1,5 @@
 using BusinessSuite.Domain.Entities;
-using BusinessSuite.Infrastructure.Persistence;
+using BusinessSuite.Application.Common.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -12,11 +12,24 @@ public static class ApplicationDbContextSeed
     {
         using var scope = serviceProvider.CreateScope();
         var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+        var passwordHasher = scope.ServiceProvider.GetRequiredService<IPasswordHasher>();
         var logger = scope.ServiceProvider.GetRequiredService<ILogger<ApplicationDbContext>>();
 
         try
         {
             await context.Database.MigrateAsync();
+
+            if (!await context.Users.IgnoreQueryFilters().AnyAsync())
+            {
+                var admin = User.Create(
+                    "admin@fresheressential.com",
+                    passwordHasher.Hash("Fresher@123"),
+                    "Fresher Admin");
+
+                context.Users.Add(admin);
+                await context.SaveChangesAsync();
+                logger.LogInformation("Seeded default Fresher Essential admin user.");
+            }
 
             if (await context.Customers.IgnoreQueryFilters().AnyAsync())
             {

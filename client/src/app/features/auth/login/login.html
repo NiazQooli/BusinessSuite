@@ -1,0 +1,78 @@
+<section class="login" aria-label="Fresher Essential sign in">
+  <div class="login__glow login__glow--a" aria-hidden="true"></div>
+  <div class="login__glow login__glow--b" aria-hidden="true"></div>
+  <div class="login__grain" aria-hidden="true"></div>
+
+  <div class="login__stage">
+    <header class="login__brand">
+      <img
+        class="login__logo"
+        src="/brand/fresher-logo.png"
+        width="420"
+        height="180"
+        alt="Fresher"
+      />
+      <p class="login__product">Essential</p>
+      <p class="login__tagline">Sign in to keep things fresher.</p>
+    </header>
+
+    <form class="login__form" (ngSubmit)="submit()" novalidate>
+      <label class="field">
+        <span class="field__label">User name</span>
+        <input
+          class="field__input"
+          type="text"
+          name="userName"
+          autocomplete="username"
+          placeholder="e.g. abid.abbas"
+          [(ngModel)]="userName"
+          required
+        />
+      </label>
+
+      <label class="field">
+        <span class="field__label">Password</span>
+        <div class="field__password">
+          <input
+            class="field__input"
+            [type]="showPassword() ? 'text' : 'password'"
+            name="password"
+            autocomplete="current-password"
+            placeholder="••••••••"
+            [(ngModel)]="password"
+            required
+          />
+          <button
+            class="field__reveal"
+            type="button"
+            (click)="togglePassword()"
+            [attr.aria-pressed]="showPassword()"
+          >
+            {{ showPassword() ? 'Hide' : 'Show' }}
+          </button>
+        </div>
+      </label>
+
+      <div class="login__row">
+        <label class="check">
+          <input type="checkbox" name="remember" [(ngModel)]="remember" />
+          <span>Remember me</span>
+        </label>
+        <a class="login__link" href="#" (click)="$event.preventDefault()">Forgot password?</a>
+      </div>
+
+      @if (error()) {
+        <p class="login__error" role="alert">{{ error() }}</p>
+      }
+
+      <button class="login__submit" type="submit" [disabled]="submitting()">
+        {{ submitting() ? 'Signing in…' : 'Sign in' }}
+      </button>
+    </form>
+
+    <p class="login__foot">
+      New here?
+      <a class="login__link" href="#" (click)="$event.preventDefault()">Create an account</a>
+    </p>
+  </div>
+</section>

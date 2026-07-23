@@ -1,3 +1,15 @@
+:root {
+  --fresher-orange: #ff8c00;
+  --fresher-orange-soft: #ffb24a;
+  --fresher-black: #050505;
+  --fresher-ink: #0c0c0c;
+  --fresher-white: #ffffff;
+  --fresher-muted: #a8a8a8;
+  --fresher-surface: #141414;
+  --fresher-font: "Nunito", "Segoe UI", sans-serif;
+  --fresher-radius: 1.5rem;
+}
+
 * {
   box-sizing: border-box;
 }
@@ -6,9 +18,9 @@ html,
 body {
   margin: 0;
   min-height: 100%;
-  background: #f3f6f8;
-  color: #1c2b36;
-  font-family: "Segoe UI", "Helvetica Neue", sans-serif;
+  background: var(--fresher-black);
+  color: var(--fresher-white);
+  font-family: var(--fresher-font);
 }
 
 button,

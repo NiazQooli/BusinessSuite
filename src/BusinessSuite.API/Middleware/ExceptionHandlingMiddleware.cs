@@ -49,6 +49,10 @@ public class ExceptionHandlingMiddleware
                 (int)HttpStatusCode.BadRequest,
                 "Domain Error",
                 new Dictionary<string, string[]> { ["error"] = new[] { domainException.Message } }),
+            UnauthorizedException unauthorizedException => (
+                (int)HttpStatusCode.Unauthorized,
+                "Unauthorized",
+                new Dictionary<string, string[]> { ["error"] = new[] { unauthorizedException.Message } }),
             _ => (
                 (int)HttpStatusCode.InternalServerError,
                 "Server Error",

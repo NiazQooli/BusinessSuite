@@ -2,11 +2,12 @@
   margin: 0 0 0.35rem;
   font-size: 1.85rem;
   letter-spacing: -0.02em;
+  color: var(--fresher-white);
 }
 
 .page__header p {
   margin: 0 0 1.5rem;
-  color: #516574;
+  color: var(--fresher-muted);
 }
 
 .metric {
@@ -15,26 +16,28 @@
   gap: 0.35rem;
   min-width: 180px;
   padding: 1.25rem 1.4rem;
-  border-radius: 0.9rem;
-  background: rgba(255, 255, 255, 0.72);
-  border: 1px solid rgba(28, 43, 54, 0.08);
+  border-radius: 1.25rem;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1.5px solid rgba(255, 255, 255, 0.12);
 }
 
 .metric__label {
   font-size: 0.85rem;
-  color: #516574;
+  color: var(--fresher-muted);
   text-transform: uppercase;
   letter-spacing: 0.06em;
 }
 
 .metric__value {
   font-size: 2rem;
+  color: var(--fresher-orange);
+  font-weight: 800;
 }
 
 .muted {
-  color: #516574;
+  color: var(--fresher-muted);
 }
 
 .error {
-  color: #8a2f2f;
+  color: #ff8f8f;
 }
