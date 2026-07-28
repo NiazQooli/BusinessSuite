@@ -42,6 +42,23 @@ export class AuthService {
     return localStorage.getItem(TOKEN_KEY) ?? sessionStorage.getItem(TOKEN_KEY);
   }
 
+  isAuthenticated(): boolean {
+    return !!this.getAccessToken();
+  }
+
+  getSession(): LoginResponse | null {
+    const raw = localStorage.getItem(SESSION_KEY) ?? sessionStorage.getItem(SESSION_KEY);
+    if (!raw) {
+      return null;
+    }
+
+    try {
+      return JSON.parse(raw) as LoginResponse;
+    } catch {
+      return null;
+    }
+  }
+
   private persistSession(response: LoginResponse, remember: boolean): void {
     const storage = remember ? localStorage : sessionStorage;
     const other = remember ? sessionStorage : localStorage;

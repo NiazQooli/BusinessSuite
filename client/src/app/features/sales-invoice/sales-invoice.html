@@ -1,0 +1,352 @@
+<section class="si">
+  <header class="si__hero">
+    <div class="si__hero-text">
+      <h1>Sales Invoice <span class="si__mode">[ {{ titleMode }} ]</span></h1>
+    </div>
+    <div class="si__badges" *ngIf="salesEntryId">
+      <span class="si__badge" [class.is-on]="checked">{{ checked ? 'Checked' : 'UnChecked' }}</span>
+      <span class="si__badge" [class.is-on]="authorized">{{ authorized ? 'Posted' : 'UnPosted' }}</span>
+    </div>
+  </header>
+
+  <div class="si__card" [class.is-busy]="loading()">
+    <div class="si__section si__section--details">
+      <h2 class="si__section-title">Invoice details</h2>
+      <div class="si__fields">
+        <label class="si__field">
+          <span>Sales Invoice No.</span>
+          <input [value]="salesEntryId ?? ''" readonly class="is-readonly" />
+        </label>
+        <label class="si__field">
+          <span>Sales Invoice Date</span>
+          <input
+            #salesEntryDateInput
+            type="date"
+            [(ngModel)]="salesEntryDate"
+            [disabled]="!isEditable"
+          />
+        </label>
+        <label class="si__field">
+          <span>Vehicle Reg. No.</span>
+          <input [(ngModel)]="vehicleRegNo" [disabled]="!isEditable" maxlength="50" />
+        </label>
+        <label class="si__field">
+          <span>Stock Location</span>
+          <input value="Default (3)" readonly class="is-readonly" />
+        </label>
+
+        <label class="si__field si__lookup" (click)="$event.stopPropagation()">
+          <span>Customer Code</span>
+          <input
+            #customerCodeInput
+            data-si-field="customer"
+            [(ngModel)]="customerCode"
+            [disabled]="!isEditable || salesPromotion"
+            (focus)="onCustomerFocus($event)"
+            (click)="onCustomerFocus($event)"
+            (input)="onCustomerInput($event)"
+            (keydown)="onCustomerKey($event)"
+            autocomplete="off"
+          />
+          <ul
+            class="si__dropdown si__dropdown--fixed si__dropdown--customer"
+            *ngIf="customerOpen && (customerOptions.length || customerLoading)"
+            [ngStyle]="customerDropdownStyle"
+          >
+            <li *ngIf="customerLoading && !customerOptions.length" class="si__dropdown-loading">
+              Loading customers…
+            </li>
+            <li
+              *ngFor="let c of customerOptions; let i = index"
+              [class.is-active]="i === customerHighlight"
+              (mousedown)="selectCustomer(c); $event.preventDefault()"
+            >
+              <strong>{{ c.customerId }}</strong>
+              <span>{{ c.customerName }}</span>
+            </li>
+          </ul>
+        </label>
+
+        <label class="si__field si__field--wide">
+          <span>Customer Name</span>
+          <input [value]="customerName" readonly class="is-readonly" />
+        </label>
+
+        <label class="si__field si__field--check">
+          <input
+            type="checkbox"
+            [(ngModel)]="salesPromotion"
+            [disabled]="!isEditable"
+            (change)="onSalesPromotionChange()"
+          />
+          <span>Sales Promotion</span>
+        </label>
+
+        <label class="si__field si__field--full">
+          <span>Address</span>
+          <input [value]="address" readonly class="is-readonly" />
+        </label>
+
+        <label class="si__field si__field--wide">
+          <span>Delivered To</span>
+          <input
+            #deliveredToInput
+            data-si-field="delivered"
+            [(ngModel)]="deliveredTo"
+            [disabled]="!isEditable"
+            maxlength="300"
+          />
+        </label>
+      </div>
+    </div>
+
+    <div class="si__section si__section--lines">
+      <div class="si__section-head">
+        <h2 class="si__section-title">Finished Goods Information</h2>
+        <button
+          type="button"
+          class="si__btn si__btn--add-row"
+          *ngIf="isEditable"
+          (click)="addLine()"
+        >
+          + Add Row
+        </button>
+      </div>
+
+      <div class="si__table-wrap">
+        <table class="si__table">
+          <thead>
+            <tr>
+              <th>FG CODE</th>
+              <th>FG NAME</th>
+              <th>NO. OF PACKS</th>
+              <th>WEIGHT</th>
+              <th>UOM</th>
+              <th>PRICE (£)</th>
+              <th>SALES VALUE (£)</th>
+              <th>NET RATE (£)</th>
+              <th>VAT %</th>
+              <th>VAT VALUE (£)</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let line of lines; let i = index" [class.is-active-row]="i === fgRowIndex">
+              <td class="si__lookup" (click)="$event.stopPropagation()">
+                <input
+                  type="number"
+                  [attr.data-si-field]="'fg'"
+                  [attr.data-row]="i"
+                  [(ngModel)]="line.fgId"
+                  [disabled]="!isEditable"
+                  (focus)="onFgFocus(i, $event)"
+                  (click)="onFgFocus(i, $event)"
+                  (input)="onFgInput(i, $event)"
+                  (keydown)="onFgKey($event, i)"
+                  autocomplete="off"
+                />
+                <ul
+                  class="si__dropdown si__dropdown--wide si__dropdown--fixed si__dropdown--fg"
+                  *ngIf="fgOpen && fgRowIndex === i && (fgOptions.length || fgLoading)"
+                  [ngStyle]="fgDropdownStyle"
+                >
+                  <li *ngIf="fgLoading && !fgOptions.length" class="si__dropdown-loading">
+                    Loading finished goods…
+                  </li>
+                  <li
+                    *ngFor="let fg of fgOptions; let j = index"
+                    [class.is-active]="j === fgHighlight"
+                    (mousedown)="selectFg(fg, i); $event.preventDefault()"
+                  >
+                    <strong>{{ fg.fgId }}</strong>
+                    <span>{{ fg.fgName }}</span>
+                  </li>
+                </ul>
+              </td>
+              <td><input [value]="line.fgName" readonly class="is-readonly" /></td>
+              <td>
+                <input
+                  type="number"
+                  [attr.data-si-field]="'packs'"
+                  [attr.data-row]="i"
+                  [(ngModel)]="line.noOfPacks"
+                  [disabled]="!isEditable"
+                  (ngModelChange)="onLineChange(i)"
+                />
+              </td>
+              <td><input [value]="line.weight ?? ''" readonly class="is-readonly" /></td>
+              <td><input [value]="line.uom" readonly class="is-readonly" /></td>
+              <td>
+                <input
+                  type="number"
+                  [attr.data-si-field]="'price'"
+                  [attr.data-row]="i"
+                  [(ngModel)]="line.basicRate"
+                  [disabled]="!isEditable"
+                  (ngModelChange)="onLineChange(i)"
+                />
+              </td>
+              <td><input [value]="line.excStValue | number: '1.2-2'" readonly class="is-readonly" /></td>
+              <td><input [value]="line.netRate | number: '1.3-3'" readonly class="is-readonly" /></td>
+              <td>
+                <input
+                  type="number"
+                  [attr.data-si-field]="'vat'"
+                  [attr.data-row]="i"
+                  [(ngModel)]="line.vatPercentage"
+                  [disabled]="!isEditable"
+                  (ngModelChange)="onLineChange(i)"
+                />
+              </td>
+              <td><input [value]="line.vatValue | number: '1.2-2'" readonly class="is-readonly" /></td>
+              <td>
+                <button type="button" class="si__row-del" *ngIf="isEditable" (click)="removeLine(i)" aria-label="Remove line">
+                  ×
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="si__bottom">
+        <div class="si__totals">
+          <div class="si__total">
+            <span>Total Weight</span>
+            <strong>{{ totalWeight | number: '1.2-2' }} <small>TONS</small></strong>
+          </div>
+          <div class="si__total">
+            <span>Total Value</span>
+            <strong>{{ totalValue | number: '1.2-2' }}</strong>
+          </div>
+          <div class="si__total">
+            <span>Total VAT</span>
+            <strong>{{ totalVat | number: '1.2-2' }}</strong>
+          </div>
+          <div class="si__total si__total--accent">
+            <span>Net Value</span>
+            <strong>{{ netValue | number: '1.2-2' }}</strong>
+          </div>
+        </div>
+
+        <footer class="si__footer">
+          <div class="si__toolbar">
+            <button type="button" class="si__btn" (click)="onNew()" [disabled]="isEditable">Add New</button>
+            <button type="button" class="si__btn" (click)="onEdit()" [disabled]="isEditable || !salesEntryId || authorized">
+              Edit
+            </button>
+            <button type="button" class="si__btn" (click)="onDelete()" [disabled]="isEditable || !salesEntryId || authorized">
+              Delete
+            </button>
+            <button type="button" class="si__btn si__btn--success" (click)="onSave()" [disabled]="!isEditable">Save</button>
+            <button type="button" class="si__btn" (click)="onCancel()" [disabled]="!isEditable">Cancel</button>
+
+            <span class="si__toolbar-divider" aria-hidden="true"></span>
+
+            <button type="button" class="si__btn si__btn--post" (click)="onPost()" [disabled]="isEditable || !salesEntryId || authorized">
+              Post
+            </button>
+            <button type="button" class="si__btn si__btn--check" (click)="onCheck()" [disabled]="isEditable || !salesEntryId || checked || authorized">
+              Check
+            </button>
+
+            <span class="si__toolbar-divider" aria-hidden="true"></span>
+
+            <button type="button" class="si__btn" (click)="openFind()" [disabled]="isEditable">Find</button>
+            <button type="button" class="si__btn" disabled>Preview</button>
+
+            <span class="si__toolbar-divider" aria-hidden="true"></span>
+
+            <button type="button" class="si__btn" (click)="onClose()">Close</button>
+
+            <label class="si__export">
+              <input type="checkbox" [(ngModel)]="exportToPdf" />
+              Export to PDF …
+            </label>
+            <button type="button" class="si__btn si__btn--sheet" disabled>Un - Check</button>
+            <button type="button" class="si__btn si__btn--sheet" disabled>Un - Post</button>
+          </div>
+        </footer>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="si-find" *ngIf="findOpen" (keydown)="onFindKey($event)" tabindex="0">
+  <div class="si-find__panel" (click)="$event.stopPropagation()">
+    <header class="si-find__header">
+      <h3>List of Values — Sales Invoice</h3>
+    </header>
+
+    <div class="si-find__filters">
+      <label class="si-find__filter">
+        <span>Search In</span>
+        <select [(ngModel)]="findSearchField" (ngModelChange)="loadFind()">
+          <option *ngFor="let f of findSearchFields" [ngValue]="f.id">{{ f.label }}</option>
+        </select>
+      </label>
+      <label class="si-find__filter si-find__filter--grow">
+        <span>Search Text</span>
+        <input
+          [(ngModel)]="findSearch"
+          (ngModelChange)="loadFind()"
+          placeholder="Type to filter…"
+          autofocus
+        />
+      </label>
+      <label class="si-find__filter">
+        <span>Sort On</span>
+        <select [(ngModel)]="findSortOn" (ngModelChange)="onFindSortOnChange()">
+          <option *ngFor="let o of findSortOnOptions" [ngValue]="o.value">{{ o.label }}</option>
+        </select>
+      </label>
+      <label class="si-find__filter">
+        <span>Sort Options</span>
+        <select [(ngModel)]="findSortFlag" (ngModelChange)="loadFind()">
+          <option *ngFor="let o of findSortFlagOptions" [ngValue]="o.value">{{ o.label }}</option>
+        </select>
+      </label>
+    </div>
+
+    <div class="si-find__grid-wrap" [class.is-loading]="findLoading">
+      <table class="si-find__grid">
+        <thead>
+          <tr>
+            <th>S.I NO.</th>
+            <th>S.I DATE</th>
+            <th>CODE</th>
+            <th>CUSTOMER NAME</th>
+            <th>NET AMOUNT</th>
+            <th>DELIVERED TO</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr
+            *ngFor="let row of findResults; let i = index"
+            [class.is-active]="i === findHighlight"
+            (click)="findHighlight = i"
+            (dblclick)="selectFind(row)"
+          >
+            <td>{{ row.salesEntryId }}</td>
+            <td>{{ row.salesEntryDate | date: 'dd/MM/yyyy' }}</td>
+            <td>{{ row.customerId }}</td>
+            <td>{{ row.customerName }}</td>
+            <td class="is-num">{{ formatFindNetAmount(row.netAmount) }}</td>
+            <td>{{ row.deliveredTo === 'N/A' ? '' : row.deliveredTo }}</td>
+          </tr>
+        </tbody>
+      </table>
+      <p class="si-find__empty" *ngIf="!findLoading && !findResults.length">No invoices found.</p>
+    </div>
+
+    <footer class="si-find__footer">
+      <span class="si-find__count">Total Records: {{ findResults.length }}</span>
+      <div class="si-find__actions">
+        <button type="button" class="si__btn si__btn--success" (click)="confirmFind()" [disabled]="findHighlight < 0">
+          OK
+        </button>
+        <button type="button" class="si__btn" (click)="closeFind()">Cancel</button>
+      </div>
+    </footer>
+  </div>
+</div>

@@ -1,17 +1,15 @@
 <section class="page">
   <header class="page__header">
     <h1>Dashboard</h1>
-    <p>Overview of your BusinessSuite workspace.</p>
+    <p class="page__breadcrumb">Home / Dashboard</p>
   </header>
 
-  @if (loading()) {
-    <p class="muted">Loading metrics…</p>
-  } @else if (error()) {
-    <p class="error">{{ error() }}</p>
-  } @else {
-    <div class="metric">
-      <span class="metric__label">Customers</span>
-      <strong class="metric__value">{{ customerCount() }}</strong>
-    </div>
-  }
+  <div class="dash-welcome">
+    <p class="dash-welcome__eyebrow">Fresher Essential</p>
+    <h2>Welcome, {{ displayName }}</h2>
+    <p>
+      Dashboard widgets will appear here once the client provides the layout and metrics.
+      Use the left menu to open <strong>Sales → Sales Invoice</strong>.
+    </p>
+  </div>
 </section>

@@ -1,19 +1,142 @@
-<div class="shell">
-  <aside class="shell__sidebar">
+<div class="shell" [class.is-sidebar-collapsed]="sidebarCollapsed()">
+  <aside class="shell__sidebar" [attr.aria-hidden]="sidebarCollapsed()">
     <div class="shell__brand">
       <img class="shell__logo" src="/brand/fresher-logo.png" width="140" height="46" alt="Fresher" />
       <p class="shell__product">Essential</p>
     </div>
 
     <nav class="shell__nav">
-      <a routerLink="/dashboard" routerLinkActive="is-active">Dashboard</a>
-      <a routerLink="/customers" routerLinkActive="is-active">Customers</a>
-    </nav>
+      <a routerLink="/dashboard" routerLinkActive="is-active" class="shell__nav-link">Dashboard</a>
 
-    <a class="shell__logout" routerLink="/login" (click)="signOut()">Sign out</a>
+      <div
+        *ngFor="let group of navGroups"
+        class="shell__nav-group"
+        [class.is-active-section]="isGroupActive(group)"
+      >
+        <button
+          type="button"
+          class="shell__nav-group-toggle"
+          (click)="toggleGroup(group.id)"
+          [attr.aria-expanded]="isGroupExpanded(group.id)"
+        >
+          <span class="shell__nav-group-label">{{ group.label }}</span>
+          <span class="shell__chevron" [class.is-open]="isGroupExpanded(group.id)"></span>
+        </button>
+
+        <div class="shell__nav-sub" *ngIf="isGroupExpanded(group.id)">
+          <a
+            *ngFor="let item of group.items"
+            [routerLink]="item.route"
+            routerLinkActive="is-active"
+            class="shell__nav-sublink"
+          >
+            {{ item.label }}
+          </a>
+        </div>
+      </div>
+
+      <a routerLink="/customers" routerLinkActive="is-active" class="shell__nav-link">Customers</a>
+    </nav>
   </aside>
 
-  <main class="shell__content">
-    <router-outlet />
-  </main>
+  <div class="shell__main">
+    <header class="shell__topbar">
+      <div class="shell__topbar-left">
+        <button
+          type="button"
+          class="shell__menu-toggle"
+          (click)="toggleSidebar()"
+          [attr.aria-expanded]="!sidebarCollapsed()"
+          aria-label="Toggle sidebar"
+          title="Expand / Collapse menu"
+        >
+          <span class="shell__menu-toggle-bar"></span>
+          <span class="shell__menu-toggle-bar"></span>
+          <span class="shell__menu-toggle-bar"></span>
+        </button>
+        <div class="shell__topbar-title">
+          <strong>Fresher Essential</strong>
+        </div>
+      </div>
+
+      <div class="shell__topbar-spacer"></div>
+
+      <div class="shell__user" (click)="$event.stopPropagation()">
+        <button type="button" class="shell__user-btn" (click)="toggleUserMenu($event)">
+          <span class="shell__user-avatar">{{ userInitial }}</span>
+          <span class="shell__user-name">{{ displayName }}</span>
+          <span class="shell__user-caret" [class.is-open]="userMenuOpen()"></span>
+        </button>
+
+        <div class="shell__user-menu" *ngIf="userMenuOpen()">
+          <p class="shell__user-menu-heading">File</p>
+          <button type="button" class="shell__user-menu-item" (click)="signOut()">Logout</button>
+          <button type="button" class="shell__user-menu-item" (click)="openChangePeriod()">
+            Change Accounting Period
+          </button>
+          <button type="button" class="shell__user-menu-item" disabled>Change Password</button>
+          <button type="button" class="shell__user-menu-item" disabled>
+            Admin Tools
+            <span class="shell__user-menu-arrow">›</span>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <main class="shell__content">
+      <router-outlet />
+    </main>
+
+    <footer class="shell__statusbar">
+      <div class="shell__status-left">
+        <span class="shell__status-item">
+          <span class="shell__status-icon" aria-hidden="true">👤</span>
+          <strong>{{ displayName }}</strong>
+        </span>
+        <span class="shell__status-sep">|</span>
+        <span class="shell__status-item">
+          <span class="shell__status-icon" aria-hidden="true">📅</span>
+          <strong>FY {{ finYear }}</strong>
+        </span>
+        <span class="shell__status-sep">|</span>
+        <span class="shell__status-item">
+          <span class="shell__status-icon" aria-hidden="true">⏱</span>
+          <strong>{{ periodLabel }}</strong>
+        </span>
+      </div>
+      <div class="shell__status-right">
+        Copyright © 2026.
+        <span class="shell__brand-mark">Fresher Essential</span>
+        . All rights reserved.
+      </div>
+    </footer>
+  </div>
+</div>
+
+<div class="shell-modal" *ngIf="periodModalOpen()" (click)="closePeriodModal()">
+  <div class="shell-modal__card" (click)="$event.stopPropagation()">
+    <h2>Change Accounting Period</h2>
+    <p class="shell-modal__hint">Select Financial Year / Accounting Period:</p>
+
+    <label class="shell-modal__field">
+      <span>Financial Year</span>
+      <select [ngModel]="selectedFinYear" (ngModelChange)="onFinYearChange($event)">
+        <option *ngFor="let opt of financialYearOptions" [value]="opt.value">{{ opt.label }}</option>
+      </select>
+    </label>
+
+    <label class="shell-modal__field">
+      <span>Accounting Period</span>
+      <select [(ngModel)]="selectedPeriod">
+        <option [ngValue]="selectedPeriod">{{ selectedPeriod }}</option>
+      </select>
+    </label>
+
+    <div class="shell-modal__actions">
+      <button type="button" class="shell-modal__btn" (click)="closePeriodModal()">Cancel</button>
+      <button type="button" class="shell-modal__btn shell-modal__btn--primary" (click)="applyPeriod()">
+        Continue to Dashboard
+      </button>
+    </div>
+  </div>
 </div>

@@ -1,13 +1,72 @@
 :root {
+  /* Brand — Fresher Essential */
   --fresher-orange: #ff8c00;
   --fresher-orange-soft: #ffb24a;
-  --fresher-black: #050505;
-  --fresher-ink: #0c0c0c;
+  --fresher-black: #121418;
+  --fresher-ink: #1a1d24;
   --fresher-white: #ffffff;
-  --fresher-muted: #a8a8a8;
-  --fresher-surface: #141414;
+  --fresher-muted: #94a3b8;
   --fresher-font: "Nunito", "Segoe UI", sans-serif;
-  --fresher-radius: 1.5rem;
+  --fresher-radius: 1.25rem;
+
+  /* App surfaces */
+  --fe-bg-app: #1e2229;
+  --fe-bg-sidebar: #171a21;
+  --fe-bg-content: #252932;
+  --fe-bg-main: #eceff4;
+  --fe-surface-card: #2f3540;
+  --fe-surface-section: #363d4a;
+  --fe-border: #4b5563;
+  --fe-border-soft: rgba(255, 255, 255, 0.1);
+
+  /* Light form panels (white + soft gray) */
+  --fe-form-surface: #ffffff;
+  --fe-form-surface-muted: #f3f5f8;
+  --fe-form-surface-section: #f8fafc;
+  --fe-form-border: #e2e8f0;
+  --fe-form-border-strong: #cbd5e1;
+  --fe-form-text: #1e293b;
+  --fe-form-text-muted: #64748b;
+  --fe-form-label: #475569;
+  --fe-form-shadow: 0 8px 28px rgba(15, 23, 42, 0.08);
+
+  /* Form controls */
+  --fe-input-bg: #f4f6f8;
+  --fe-input-border: #c5cdd8;
+  --fe-input-text: #1e293b;
+  --fe-input-placeholder: #64748b;
+  --fe-readonly-bg: #eef2f6;
+  --fe-readonly-text: #334155;
+  --fe-readonly-border: #d1dae6;
+
+  /* Text on dark surfaces */
+  --fe-text-primary: #f1f5f9;
+  --fe-text-secondary: #94a3b8;
+  --fe-text-label: #cbd5e1;
+
+  /* Actions — default toolbar on light forms */
+  --fe-btn-default-bg: #e8ecf2;
+  --fe-btn-default-text: #1e293b;
+  --fe-btn-default-border: #c5cdd8;
+  --fe-btn-default-hover-bg: #dce2ec;
+
+  --fe-success: #16a34a;
+  --fe-success-hover: #15803d;
+  --fe-success-text: #ffffff;
+
+  --fe-post: #0d9488;
+  --fe-post-hover: #0f766e;
+  --fe-post-text: #ffffff;
+
+  --fe-check: #2563eb;
+  --fe-check-hover: #1d4ed8;
+  --fe-check-text: #ffffff;
+
+  --fe-danger: #dc2626;
+  --fe-danger-hover: #b91c1c;
+
+  /* Legacy alias */
+  --fresher-surface: var(--fe-surface-card);
 }
 
 * {
@@ -18,8 +77,8 @@ html,
 body {
   margin: 0;
   min-height: 100%;
-  background: var(--fresher-black);
-  color: var(--fresher-white);
+  background: var(--fe-bg-app);
+  color: var(--fe-text-primary);
   font-family: var(--fresher-font);
 }
 

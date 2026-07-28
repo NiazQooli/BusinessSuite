@@ -1,0 +1,37 @@
+<div
+  class="fe-confirm"
+  *ngIf="confirmService.active() as dialog"
+  (mousedown)="onBackdropClick($event)"
+  role="dialog"
+  aria-modal="true"
+  [attr.aria-labelledby]="'fe-confirm-title-' + dialog.id"
+>
+  <div class="fe-confirm__card" [class]="'fe-confirm__card fe-confirm__card--' + (dialog.tone || 'default')">
+    <div class="fe-confirm__icon" aria-hidden="true">
+      <span *ngIf="dialog.tone === 'danger'">!</span>
+      <span *ngIf="dialog.tone === 'success'">✓</span>
+      <span *ngIf="dialog.tone === 'warning'">?</span>
+      <span *ngIf="!dialog.tone || dialog.tone === 'default'">?</span>
+    </div>
+    <div class="fe-confirm__content">
+      <h2 [id]="'fe-confirm-title-' + dialog.id">{{ dialog.title }}</h2>
+      <p>{{ dialog.message }}</p>
+    </div>
+    <div class="fe-confirm__actions">
+      <button type="button" class="fe-confirm__btn fe-confirm__btn--ghost" (click)="confirmService.cancel()">
+        {{ dialog.cancelText }}
+      </button>
+      <button
+        type="button"
+        class="fe-confirm__btn"
+        [class.fe-confirm__btn--danger]="dialog.tone === 'danger'"
+        [class.fe-confirm__btn--success]="dialog.tone === 'success'"
+        [class.fe-confirm__btn--primary]="!dialog.tone || dialog.tone === 'default' || dialog.tone === 'warning'"
+        (click)="confirmService.confirm()"
+        autofocus
+      >
+        {{ dialog.confirmText }}
+      </button>
+    </div>
+  </div>
+</div>

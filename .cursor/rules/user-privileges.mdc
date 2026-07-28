@@ -1,0 +1,43 @@
+---
+description: Legacy Fresher Essential menus and user privileges (dbFE)
+alwaysApply: true
+---
+
+# Menus & privileges (Fresher Essential / dbFE)
+
+Menus and screen rights come from the **existing database** — do not invent a new permission/menu schema unless asked.
+
+## Table: `tblSftMenuItems` (catalog / hierarchy)
+
+- **PK:** `(CompanyID, MenuName)`
+- **FK:** → `tblSftCompany` `(CompanyID)`
+- **Display:** `MenuCaption`; stable key: `MenuName` (e.g. `optActBPHO`)
+- **Hierarchy:** `MainMenuName` (parent), `MenuLevel`, `MenuSrNo`, `MenuPriority`, `CompleteMenuName`
+- **Module:** `ModuleName`
+- **Flags:** `IsReportActive`, `InactiveMenu` (skip inactive by default)
+- **Legacy:** `HasRights` varchar(17) — prefer privilege bit columns on the user table for rights
+
+## Table: `tblAdmUserPrivilege` (user-wise rights)
+
+- **PK:** `(CompanyID, UserID, MenuName)`
+- **FK:** → `tblAdmUser`; → `tblSftMenuItems`
+- **Flags (bit):** `CanAdd`, `CanEdit`, `CanDelete`, `CanPost`, `CanPrint`, `CanView`, `CanExport`, `CanUnpost`, `CanCheck`
+- **Legacy:** `HasRights` semicolon string — prefer bit columns in app logic
+
+Join path for dynamic menus later: `tblSftMenuItems` ⋈ `tblAdmUserPrivilege` on `(CompanyID, MenuName)` filtered by signed-in `UserID`, usually requiring `CanView = 1` and `InactiveMenu = 0`.
+
+## App mapping (already in codebase)
+
+| Concern | Entity | API | Angular |
+|---------|--------|-----|---------|
+| Privileges | `AdmUserPrivilege` | `GET /api/v1/privileges/me` | `PrivilegeService.getMine()` |
+| Menus | `SftMenuItem` | `GET /api/v1/menus` | `MenuService.getForCompany()` |
+
+Both EF configs use **`ExcludeFromMigrations()`** — tables already exist on `dbFE`.
+
+## Rules when extending
+
+1. Never EF-migrate these legacy tables.
+2. Screen/menu visibility: `MenuName` + privilege flags (especially `CanView`).
+3. Captions/tree from `SftMenuItem`; rights from `AdmUserPrivilege`.
+4. Identity: JWT subject `{CompanyId}:{UserId}` (+ `company_id` claim).

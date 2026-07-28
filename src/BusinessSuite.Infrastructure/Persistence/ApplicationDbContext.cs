@@ -20,6 +20,15 @@ public class ApplicationDbContext : DbContext, IApplicationDbContext
     public DbSet<Customer> Customers => Set<Customer>();
     public DbSet<User> Users => Set<User>();
     public DbSet<AdmUser> AdmUsers => Set<AdmUser>();
+    public DbSet<AdmUserPrivilege> AdmUserPrivileges => Set<AdmUserPrivilege>();
+    public DbSet<SftMenuItem> SftMenuItems => Set<SftMenuItem>();
+    public DbSet<SalSalesEntry> SalSalesEntries => Set<SalSalesEntry>();
+    public DbSet<SalSalesEntryDetail> SalSalesEntryDetails => Set<SalSalesEntryDetail>();
+    public DbSet<SalCustomerInfo> SalCustomerInfos => Set<SalCustomerInfo>();
+    public DbSet<InvItemFg> InvItemFgs => Set<InvItemFg>();
+    public DbSet<InvItemFgBrand> InvItemFgBrands => Set<InvItemFgBrand>();
+    public DbSet<InvItemFgUom> InvItemFgUoms => Set<InvItemFgUom>();
+    public DbSet<SftFinancialYearCompany> SftFinancialYearCompanies => Set<SftFinancialYearCompany>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

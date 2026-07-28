@@ -1,0 +1,27 @@
+<div class="fe-toast-host" aria-live="polite" aria-relevant="additions">
+  <div
+    class="fe-toast"
+    *ngFor="let toast of toastService.toasts()"
+    [class]="'fe-toast fe-toast--' + toast.type"
+    role="status"
+  >
+    <span class="fe-toast__icon" aria-hidden="true">{{ iconFor(toast.type) }}</span>
+    <div class="fe-toast__body">
+      <strong class="fe-toast__title" *ngIf="toast.title">{{ toast.title }}</strong>
+      <p class="fe-toast__message">{{ toast.message }}</p>
+    </div>
+    <button
+      type="button"
+      class="fe-toast__close"
+      (click)="dismiss(toast.id)"
+      aria-label="Dismiss"
+    >
+      ×
+    </button>
+    <span
+      class="fe-toast__progress"
+      [style.animation-duration]="toast.durationMs + 'ms'"
+      aria-hidden="true"
+    ></span>
+  </div>
+</div>
