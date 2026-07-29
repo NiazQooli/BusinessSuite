@@ -19,25 +19,25 @@
   --fe-border: #4b5563;
   --fe-border-soft: rgba(255, 255, 255, 0.1);
 
-  /* Light form panels (white + soft gray) */
+  /* Light form panels — crisp white, clear contrast (Fresher) */
   --fe-form-surface: #ffffff;
-  --fe-form-surface-muted: #f3f5f8;
-  --fe-form-surface-section: #f8fafc;
-  --fe-form-border: #e2e8f0;
-  --fe-form-border-strong: #cbd5e1;
-  --fe-form-text: #1e293b;
-  --fe-form-text-muted: #64748b;
-  --fe-form-label: #475569;
-  --fe-form-shadow: 0 8px 28px rgba(15, 23, 42, 0.08);
+  --fe-form-surface-muted: #ffffff;
+  --fe-form-surface-section: #ffffff;
+  --fe-form-border: #d5dbe6;
+  --fe-form-border-strong: #9aa8bc;
+  --fe-form-text: #0f172a;
+  --fe-form-text-muted: #475569;
+  --fe-form-label: #1e293b;
+  --fe-form-shadow: 0 10px 28px rgba(15, 23, 42, 0.1);
 
-  /* Form controls */
-  --fe-input-bg: #f4f6f8;
-  --fe-input-border: #c5cdd8;
-  --fe-input-text: #1e293b;
+  /* Form controls — white fields, readable borders */
+  --fe-input-bg: #ffffff;
+  --fe-input-border: #94a3b8;
+  --fe-input-text: #0f172a;
   --fe-input-placeholder: #64748b;
-  --fe-readonly-bg: #eef2f6;
+  --fe-readonly-bg: #f1f5f9;
   --fe-readonly-text: #334155;
-  --fe-readonly-border: #d1dae6;
+  --fe-readonly-border: #cbd5e1;
 
   /* Text on dark surfaces */
   --fe-text-primary: #f1f5f9;
@@ -45,10 +45,10 @@
   --fe-text-label: #cbd5e1;
 
   /* Actions — default toolbar on light forms */
-  --fe-btn-default-bg: #e8ecf2;
-  --fe-btn-default-text: #1e293b;
-  --fe-btn-default-border: #c5cdd8;
-  --fe-btn-default-hover-bg: #dce2ec;
+  --fe-btn-default-bg: #ffffff;
+  --fe-btn-default-text: #0f172a;
+  --fe-btn-default-border: #94a3b8;
+  --fe-btn-default-hover-bg: #fff7ed;
 
   --fe-success: #16a34a;
   --fe-success-hover: #15803d;
@@ -76,7 +76,9 @@
 html,
 body {
   margin: 0;
-  min-height: 100%;
+  height: 100%;
+  max-height: 100%;
+  overflow: hidden;
   background: var(--fe-bg-app);
   color: var(--fe-text-primary);
   font-family: var(--fresher-font);

@@ -26,6 +26,7 @@ import { PrivilegeService } from '../../core/services/privilege.service';
 import { UserPrivilege } from '../../core/models/privilege.model';
 import { ToastService } from '../../core/services/toast.service';
 import { ConfirmDialogService } from '../../core/services/confirm-dialog.service';
+import { FeIconComponent } from '../../shared/icon/fe-icon';
 
 const PERIOD_STORAGE_KEY = 'fresher.accountingPeriod';
 
@@ -37,7 +38,7 @@ type FormMode = 'view' | 'add' | 'edit';
 @Component({
   selector: 'app-sales-invoice',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, FeIconComponent],
   templateUrl: './sales-invoice.html',
   styleUrl: './sales-invoice.scss',
 })

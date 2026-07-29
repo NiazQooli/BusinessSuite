@@ -109,7 +109,8 @@
           *ngIf="isEditable"
           (click)="addLine()"
         >
-          + Add Row
+          <fe-icon name="row-add"></fe-icon>
+          <span>Add Row</span>
         </button>
       </div>
 
@@ -208,8 +209,9 @@
           </tbody>
         </table>
       </div>
+    </div>
 
-      <div class="si__bottom">
+    <div class="si__bottom">
         <div class="si__totals">
           <div class="si__total">
             <span>Total Weight</span>
@@ -231,43 +233,71 @@
 
         <footer class="si__footer">
           <div class="si__toolbar">
-            <button type="button" class="si__btn" (click)="onNew()" [disabled]="isEditable">Add New</button>
+            <button type="button" class="si__btn" (click)="onNew()" [disabled]="isEditable">
+              <fe-icon name="add"></fe-icon>
+              <span>Add New</span>
+            </button>
             <button type="button" class="si__btn" (click)="onEdit()" [disabled]="isEditable || !salesEntryId || authorized">
-              Edit
+              <fe-icon name="edit"></fe-icon>
+              <span>Edit</span>
             </button>
             <button type="button" class="si__btn" (click)="onDelete()" [disabled]="isEditable || !salesEntryId || authorized">
-              Delete
+              <fe-icon name="delete"></fe-icon>
+              <span>Delete</span>
             </button>
-            <button type="button" class="si__btn si__btn--success" (click)="onSave()" [disabled]="!isEditable">Save</button>
-            <button type="button" class="si__btn" (click)="onCancel()" [disabled]="!isEditable">Cancel</button>
+            <button type="button" class="si__btn si__btn--success" (click)="onSave()" [disabled]="!isEditable">
+              <fe-icon name="save"></fe-icon>
+              <span>Save</span>
+            </button>
+            <button type="button" class="si__btn" (click)="onCancel()" [disabled]="!isEditable">
+              <fe-icon name="cancel"></fe-icon>
+              <span>Cancel</span>
+            </button>
 
             <span class="si__toolbar-divider" aria-hidden="true"></span>
 
             <button type="button" class="si__btn si__btn--post" (click)="onPost()" [disabled]="isEditable || !salesEntryId || authorized">
-              Post
+              <fe-icon name="post"></fe-icon>
+              <span>Post</span>
             </button>
             <button type="button" class="si__btn si__btn--check" (click)="onCheck()" [disabled]="isEditable || !salesEntryId || checked || authorized">
-              Check
+              <fe-icon name="check"></fe-icon>
+              <span>Check</span>
             </button>
 
             <span class="si__toolbar-divider" aria-hidden="true"></span>
 
-            <button type="button" class="si__btn" (click)="openFind()" [disabled]="isEditable">Find</button>
-            <button type="button" class="si__btn" disabled>Preview</button>
+            <button type="button" class="si__btn" (click)="openFind()" [disabled]="isEditable">
+              <fe-icon name="find"></fe-icon>
+              <span>Find</span>
+            </button>
+            <button type="button" class="si__btn" disabled>
+              <fe-icon name="preview"></fe-icon>
+              <span>Preview</span>
+            </button>
 
             <span class="si__toolbar-divider" aria-hidden="true"></span>
 
-            <button type="button" class="si__btn" (click)="onClose()">Close</button>
+            <button type="button" class="si__btn" (click)="onClose()">
+              <fe-icon name="close"></fe-icon>
+              <span>Close</span>
+            </button>
 
             <label class="si__export">
+              <fe-icon name="pdf"></fe-icon>
               <input type="checkbox" [(ngModel)]="exportToPdf" />
-              Export to PDF …
+              <span>Export to PDF …</span>
             </label>
-            <button type="button" class="si__btn si__btn--sheet" disabled>Un - Check</button>
-            <button type="button" class="si__btn si__btn--sheet" disabled>Un - Post</button>
+            <button type="button" class="si__btn si__btn--sheet" disabled>
+              <fe-icon name="uncheck"></fe-icon>
+              <span>Un - Check</span>
+            </button>
+            <button type="button" class="si__btn si__btn--sheet" disabled>
+              <fe-icon name="unpost"></fe-icon>
+              <span>Un - Post</span>
+            </button>
           </div>
         </footer>
-      </div>
     </div>
   </div>
 </section>
@@ -343,9 +373,13 @@
       <span class="si-find__count">Total Records: {{ findResults.length }}</span>
       <div class="si-find__actions">
         <button type="button" class="si__btn si__btn--success" (click)="confirmFind()" [disabled]="findHighlight < 0">
-          OK
+          <fe-icon name="ok"></fe-icon>
+          <span>OK</span>
         </button>
-        <button type="button" class="si__btn" (click)="closeFind()">Cancel</button>
+        <button type="button" class="si__btn" (click)="closeFind()">
+          <fe-icon name="cancel"></fe-icon>
+          <span>Cancel</span>
+        </button>
       </div>
     </footer>
   </div>

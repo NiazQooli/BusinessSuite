@@ -16,7 +16,9 @@ import { ConfirmDialogComponent } from './shared/confirm-dialog/confirm-dialog';
     `
       :host {
         display: block;
-        min-height: 100vh;
+        height: 100%;
+        max-height: 100%;
+        overflow: hidden;
       }
     `,
   ],
