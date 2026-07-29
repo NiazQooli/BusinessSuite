@@ -13,7 +13,8 @@ import {
   signal,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Subscription } from 'rxjs';
+import { Subject, Subscription } from 'rxjs';
+import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { SalesInvoiceService } from '../../core/services/sales-invoice.service';
 import {
   CustomerLookup,
@@ -31,6 +32,7 @@ import { FeIconComponent } from '../../shared/icon/fe-icon';
 const PERIOD_STORAGE_KEY = 'fresher.accountingPeriod';
 
 type FindSearchField = 'siType' | 'siNo' | 'siDate' | 'code' | 'customerName' | 'deliveredTo';
+type FindEntryStatus = 'unchecked' | 'unposted' | 'posted';
 type FindSortOn = 'authorized' | 'checked';
 
 type FormMode = 'view' | 'add' | 'edit';
@@ -60,6 +62,9 @@ export class SalesInvoiceComponent implements OnInit, OnDestroy {
   private customerSearchSub?: Subscription;
   private fgSearchSub?: Subscription;
   private prefetchSub?: Subscription;
+  private findSearchSub?: Subscription;
+  private findSearchDebounceSub?: Subscription;
+  private readonly findSearchText$ = new Subject<string>();
 
   @ViewChild('salesEntryDateInput') salesEntryDateInput?: ElementRef<HTMLInputElement>;
   @ViewChild('deliveredToInput') deliveredToInput?: ElementRef<HTMLInputElement>;
@@ -108,8 +113,7 @@ export class SalesInvoiceComponent implements OnInit, OnDestroy {
   findOpen = false;
   findSearch = '';
   findSearchField: FindSearchField = 'siNo';
-  findSortOn: FindSortOn = 'authorized';
-  findSortFlag = false;
+  findEntryStatus: FindEntryStatus = 'unposted';
   findResults: SalesInvoiceListItem[] = [];
   findHighlight = 0;
   findLoading = false;
@@ -123,6 +127,12 @@ export class SalesInvoiceComponent implements OnInit, OnDestroy {
     { id: 'code', label: 'CODE' },
     { id: 'customerName', label: 'CUSTOMER NAME' },
     { id: 'deliveredTo', label: 'DELIVERED TO' },
+  ];
+
+  readonly findEntryStatusOptions: { value: FindEntryStatus; label: string }[] = [
+    { value: 'unchecked', label: 'UnChecked' },
+    { value: 'unposted', label: 'UnPosted' },
+    { value: 'posted', label: 'Posted' },
   ];
 
   ngOnInit(): void {
@@ -148,50 +158,30 @@ export class SalesInvoiceComponent implements OnInit, OnDestroy {
         this.userCanCheck = false;
       },
     });
+
+    this.findSearchDebounceSub = this.findSearchText$
+      .pipe(debounceTime(220), distinctUntilChanged())
+      .subscribe((term) => {
+        this.findSearch = term;
+        this.loadFind();
+      });
   }
 
   ngOnDestroy(): void {
     this.customerSearchSub?.unsubscribe();
     this.fgSearchSub?.unsubscribe();
     this.prefetchSub?.unsubscribe();
+    this.findSearchSub?.unsubscribe();
+    this.findSearchDebounceSub?.unsubscribe();
+    this.findSearchText$.complete();
   }
 
-  get findSortOnOptions(): { value: FindSortOn; label: string }[] {
-    if (this.userCanPost) {
-      return [
-        { value: 'authorized', label: 'Authorized' },
-        { value: 'checked', label: 'Checked' },
-      ];
-    }
-    return [
-      { value: 'checked', label: 'Checked' },
-      { value: 'authorized', label: 'Authorized' },
-    ];
+  get findSortOn(): FindSortOn {
+    return this.findEntryStatus === 'unchecked' ? 'checked' : 'authorized';
   }
 
-  get findSortFlagOptions(): { value: boolean; label: string }[] {
-    if (this.findSortOn === 'authorized') {
-      if (this.userCanPost) {
-        return [
-          { value: false, label: 'UnPosted' },
-          { value: true, label: 'Posted' },
-        ];
-      }
-      return [
-        { value: true, label: 'Posted' },
-        { value: false, label: 'UnPosted' },
-      ];
-    }
-    if (this.userCanPost) {
-      return [
-        { value: false, label: 'UnChecked' },
-        { value: true, label: 'Checked' },
-      ];
-    }
-    return [
-      { value: false, label: 'UnChecked' },
-      { value: true, label: 'Checked' },
-    ];
+  get findSortFlag(): boolean {
+    return this.findEntryStatus === 'posted';
   }
 
   get isEditable(): boolean {
@@ -258,14 +248,36 @@ export class SalesInvoiceComponent implements OnInit, OnDestroy {
     if (!ok) {
       return;
     }
-    this.api.delete(this.salesEntryId, this.finYear).subscribe({
+
+    const id = this.salesEntryId;
+    const finYear = this.finYear;
+    this.loading.set(true);
+    this.api.delete(id, finYear).subscribe({
       next: () => {
-        this.clearForm();
-        this.mode.set('view');
+        this.resetAfterDelete();
         this.toast.success('Sales invoice deleted.');
       },
-      error: (err) => this.toast.error(err?.error?.detail ?? 'Delete failed.'),
+      error: (err) => {
+        this.loading.set(false);
+        this.cdr.detectChanges();
+        this.toast.error(err?.error?.detail ?? 'Delete failed.');
+      },
     });
+  }
+
+  private resetAfterDelete(): void {
+    this.clearForm();
+    this.mode.set('view');
+    this.salesEntryDate = this.toInputDate(new Date());
+    this.exportToPdf = false;
+    this.customerOpen = false;
+    this.fgOpen = false;
+    this.customerOptions = [];
+    this.fgOptions = [];
+    this.customerDropdownStyle = null;
+    this.fgDropdownStyle = null;
+    this.loading.set(false);
+    this.cdr.detectChanges();
   }
 
   async onSave(): Promise<void> {
@@ -396,14 +408,17 @@ export class SalesInvoiceComponent implements OnInit, OnDestroy {
     this.findOpen = true;
     this.findSearch = '';
     this.findSearchField = 'siNo';
-    this.findSortOn = this.userCanPost ? 'authorized' : 'checked';
-    this.findSortFlag = false;
+    this.findEntryStatus = this.userCanPost ? 'unposted' : 'unchecked';
     this.findHighlight = 0;
+    this.findResults = [];
     this.loadFind();
   }
 
-  onFindSortOnChange(): void {
-    this.findSortFlag = this.findSortFlagOptions[0]?.value ?? false;
+  onFindSearchText(term: string): void {
+    this.findSearchText$.next(term ?? '');
+  }
+
+  onFindFilterChange(): void {
     this.loadFind();
   }
 
@@ -422,24 +437,32 @@ export class SalesInvoiceComponent implements OnInit, OnDestroy {
       periodEnd: period?.end,
       take: 500,
     };
+
     this.findLoading = true;
-    this.api.search(params).subscribe({
+    this.cdr.detectChanges();
+
+    this.findSearchSub?.unsubscribe();
+    this.findSearchSub = this.api.search(params).subscribe({
       next: (rows) => {
         this.findResults = rows;
         this.findHighlight = rows.length ? 0 : -1;
         this.findLoading = false;
+        this.cdr.detectChanges();
       },
       error: () => {
         this.findResults = [];
         this.findHighlight = -1;
         this.findLoading = false;
+        this.cdr.detectChanges();
         this.toast.error('Unable to load find list.');
       },
     });
   }
 
   closeFind(): void {
+    this.findSearchSub?.unsubscribe();
     this.findOpen = false;
+    this.findLoading = false;
   }
 
   confirmFind(): void {
@@ -468,11 +491,29 @@ export class SalesInvoiceComponent implements OnInit, OnDestroy {
   }
 
   formatFindNetAmount(amount: number): string {
-    const fixed = amount.toFixed(2);
-    if (fixed.endsWith('.00')) {
-      return fixed.slice(0, -3);
+    const n = Number(amount) || 0;
+    const hasPence = Math.abs(n % 1) >= 0.005;
+    return n.toLocaleString('en-GB', {
+      minimumFractionDigits: hasPence ? 2 : 0,
+      maximumFractionDigits: 2,
+      useGrouping: true,
+    });
+  }
+
+  /** Money / price display with thousand separators (en-GB). */
+  formatMoney(value: number | string | null | undefined, fractionDigits = 2): string {
+    if (value == null || value === '') {
+      return '';
     }
-    return fixed;
+    const n = Number(value);
+    if (Number.isNaN(n)) {
+      return '';
+    }
+    return n.toLocaleString('en-GB', {
+      minimumFractionDigits: fractionDigits,
+      maximumFractionDigits: fractionDigits,
+      useGrouping: true,
+    });
   }
 
   onFindKey(event: KeyboardEvent): void {
@@ -1041,11 +1082,18 @@ export class SalesInvoiceComponent implements OnInit, OnDestroy {
     this.salesPromotion = false;
     this.checked = false;
     this.authorized = false;
+    this.exportToPdf = false;
     this.lines = [this.emptyLine()];
     this.totalWeight = 0;
     this.totalValue = 0;
     this.totalVat = 0;
     this.netValue = 0;
+    this.customerOpen = false;
+    this.fgOpen = false;
+    this.customerOptions = [];
+    this.fgOptions = [];
+    this.customerDropdownStyle = null;
+    this.fgDropdownStyle = null;
   }
 
   private emptyLine(): SalesInvoiceLine {

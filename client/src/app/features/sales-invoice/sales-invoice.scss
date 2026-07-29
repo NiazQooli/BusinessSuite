@@ -655,8 +655,7 @@
 .si-find {
   position: fixed;
   inset: 0;
-  background: rgba(15, 23, 42, 0.55);
-  backdrop-filter: blur(4px);
+  background: rgba(15, 23, 42, 0.45);
   display: grid;
   place-items: center;
   z-index: 50;
@@ -674,6 +673,7 @@
   flex-direction: column;
   gap: 0.65rem;
   box-shadow: 0 24px 48px rgba(15, 23, 42, 0.22);
+  outline: none;
 }
 
 .si-find__header h3 {
@@ -685,7 +685,7 @@
 
 .si-find__filters {
   display: grid;
-  grid-template-columns: minmax(8rem, 1fr) 2fr minmax(7rem, 1fr) minmax(7rem, 1fr);
+  grid-template-columns: minmax(8rem, 1fr) 2fr minmax(8.5rem, 1fr);
   gap: 0.55rem 0.75rem;
   align-items: end;
 }
@@ -706,7 +706,7 @@
 .si-find__filter select,
 .si-find__filter input {
   border: 1px solid var(--fe-input-border);
-  background: var(--fe-input-bg);
+  background: #ffffff;
   color: var(--fe-input-text);
   padding: 0.42rem 0.5rem;
   border-radius: 0.35rem;
@@ -714,7 +714,15 @@
   min-height: 2.1rem;
 }
 
+.si-find__filter select:focus,
+.si-find__filter input:focus {
+  outline: none;
+  border-color: var(--fresher-orange);
+  box-shadow: 0 0 0 3px rgba(255, 140, 0, 0.18);
+}
+
 .si-find__grid-wrap {
+  position: relative;
   flex: 1 1 auto;
   min-height: 14rem;
   max-height: 42vh;
@@ -723,14 +731,47 @@
   background: #fff;
 }
 
-.si-find__grid-wrap.is-loading {
-  opacity: 0.65;
+.si-find__loading {
+  position: sticky;
+  top: 0;
+  z-index: 3;
+  padding: 0.35rem 0.55rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #9a3412;
+  background: #fff7ed;
+  border-bottom: 1px solid rgba(255, 140, 0, 0.35);
 }
 
 .si-find__grid {
   width: 100%;
   border-collapse: collapse;
+  table-layout: fixed;
   font-size: 0.82rem;
+}
+
+.si-find__col--si-no {
+  width: 12%;
+}
+
+.si-find__col--date {
+  width: 14%;
+}
+
+.si-find__col--code {
+  width: 12%;
+}
+
+.si-find__col--name {
+  width: 28%;
+}
+
+.si-find__col--amount {
+  width: 14%;
+}
+
+.si-find__col--delivered {
+  width: 20%;
 }
 
 .si-find__grid th {
@@ -739,21 +780,28 @@
   z-index: 1;
   background: #1e293b;
   border-bottom: 2px solid var(--fresher-orange);
-  padding: 0.45rem 0.5rem;
+  padding: 0.5rem 0.55rem;
   text-align: left;
   font-size: 0.68rem;
   font-weight: 800;
   letter-spacing: 0.04em;
   text-transform: uppercase;
   color: #ffffff;
+  vertical-align: middle;
+  white-space: nowrap;
 }
 
 .si-find__grid td {
   border-bottom: 1px solid var(--fe-form-border);
-  padding: 0.38rem 0.5rem;
+  padding: 0.42rem 0.55rem;
   vertical-align: middle;
+  text-align: left;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
+.si-find__grid th.is-num,
 .si-find__grid td.is-num {
   text-align: right;
   font-variant-numeric: tabular-nums;

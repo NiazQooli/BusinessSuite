@@ -1,0 +1,3596 @@
+﻿[Image]
+<image_files>
+The following images were provided by the user and saved to the workspace for future use:
+1. C:\Users\AH LAPTOP\.cursor\projects\c-Users-AH-LAPTOP-source-repos-BusinessSuite/assets/c__Users_AH_LAPTOP_AppData_Roaming_Cursor_User_workspaceStorage_empty-window_images_SCREEN-76df8a26-5d06-43b7-a6ac-b3cafd6892a0.png
+
+These images can be copied for use in other locations.
+</image_files>
+<timestamp>Saturday, Jul 25, 2026, 1:20 PM (UTC+5)</timestamp>
+<user_query>
+ye fresher essential k name se new .net core api and angular me application bna rha hun uk client k lie ye application old vb 6 me bna hwa tha ab wo latest stack pay migrate kr rha hai meny project setup kr dia hai login form etc bna lia hai ab wo kh rha hai urgent sale invoice de do so hm db and tables same wahe porana use kr rhay hen and vb code me apko deta hun koi extra nhi krna same login apply kr k bna dena but jahan py vb me pop se search hota hai wo login usi field pay mouse cursor focus pay wo data populate hona chaye any smooth up down arrow se upe nechay jana chaye left seid pe ek menu lagao then wahan se open kr sakay vb code and design me attached krta hun yahan for sale invoice
+
+Option Explicit
+
+Private Enum SearchCaller
+   scFind
+   scFGCode
+   scCustomer
+   scRateInformation
+End Enum
+
+Dim mstrFrmCaption         As String
+Dim mstrSearchedText       As String
+Dim mstrSalesTableName     As String
+
+Dim mvarFormMode           As enzFormMode
+Dim mUserPriv              As enzCPrivilege
+Dim mscSearchCaller        As SearchCaller
+
+Public Property Set UserPrivilege(ByRef vNewValue As enzCPrivilege)
+   Set mUserPriv = vNewValue
+End Property
+
+Public Property Let SearchedText(ByVal vNewValue As String)
+   mstrSearchedText = vNewValue
+End Property
+
+Public Property Let SalesTableName(ByVal vNewValue As String)
+   mstrSalesTableName = vNewValue
+End Property
+
+Public Sub DisplaySearchResult()
+   Dim SelArr() As String
+   
+   Dim mrsRatesInformation As New ADODB.Recordset
+
+   If mscSearchCaller = scFind Then
+
+      Call ClearFormObjects(Me)
+
+      With fpgTransaction
+         .MaxRows = 0
+         .MaxRows = 2
+         .SetActiveCell 1, 1
+      End With
+      
+      chkExport.Enabled = True
+      
+      If Len(mstrSearchedText) > 0 Then
+
+         SelArr = Split(mstrSearchedText, ";")
+         
+         mebSalesEntryID.text = SelArr(1)
+         
+         mebSalesEntryDate.text = Format(SelArr(2), gstrDateFormat)
+         
+         txtVehRegNo.text = SelArr(3)
+         
+'''         If SelArr(47) = "" Then
+'''            cboWarehouse.ListIndex = 0
+'''
+'''         Else
+'''            cboWarehouse.text = SelArr(47)
+'''
+'''         End If
+         
+         mebCustomerCode.text = SelArr(4)
+         infCustomerName.Caption = SelArr(5)
+         infCustomerAddress.Caption = SelArr(18)
+         infDistShop.Caption = SelArr(52)
+         
+         If SelArr(4) = "99001" Then
+            chkSalesProm.Value = vbChecked
+         Else
+            chkSalesProm.Value = vbUnchecked
+         End If
+         
+         infExcSEDnSTValue.Caption = Format(SelArr(6), "##,##0.00")
+         
+         infVATValue.Caption = Format(SelArr(51), "##,##0.00")
+         
+         infNetValue.Caption = Format(SelArr(9), "##,##0.00")
+         
+         infTotalWeight.Caption = Format(SelArr(10), "##,##0.00")
+         
+         txtDeliveredTo.text = SelArr(26)
+         
+         If CBool(SelArr(16)) = True Then
+            cmdUncheck.Enabled = False
+         Else
+            cmdUncheck.Enabled = CBool(SelArr(15))
+         End If
+         
+         cmdUnpost.Enabled = CBool(SelArr(16))
+
+         Call enztb.SetToolbarNewVersion(enzButtonCheck, mUserPriv, CBool(SelArr(15)), CBool(SelArr(16)))
+         Call DisplayDocStatusNewVersion(CBool(SelArr(15)), CBool(SelArr(16)))
+         
+'''         enztb.Preview = CBool(SelArr(15)) And mUserPriv.CanPrint
+
+         Call ShowValues(CStr(SelArr(0)), Val(SelArr(1)))
+
+      Else
+         cmdUncheck.Enabled = False
+         cmdUnpost.Enabled = False
+         
+         Call enztb.SetToolbarNewVersion(enzButtonLoad, mUserPriv)
+         Call DisplayDocStatusNewVersion(False, False, True)
+
+      End If
+      
+   ElseIf mscSearchCaller = scFGCode Then
+   
+      If Len(mstrSearchedText) > 0 Then
+         
+         SelArr = Split(mstrSearchedText, ";")
+         
+         fpgTransaction.SetText 1, fpgTransaction.ActiveRow, SelArr(0)
+         
+         If IsKeyValueExistsInGrid(fpgTransaction, SelArr(0), 1, _
+            "Finished Goods Code has already been entered.") = False Then
+            
+            fpgTransaction.SetText 2, fpgTransaction.ActiveRow, ""
+            fpgTransaction.SetText 3, fpgTransaction.ActiveRow, ""
+            fpgTransaction.SetText 4, fpgTransaction.ActiveRow, ""
+            fpgTransaction.SetText 5, fpgTransaction.ActiveRow, ""
+            fpgTransaction.SetText 6, fpgTransaction.ActiveRow, ""
+            fpgTransaction.SetText 7, fpgTransaction.ActiveRow, ""
+            fpgTransaction.SetText 8, fpgTransaction.ActiveRow, ""
+            fpgTransaction.SetText 9, fpgTransaction.ActiveRow, ""
+            fpgTransaction.SetText 10, fpgTransaction.ActiveRow, ""
+            fpgTransaction.SetText 11, fpgTransaction.ActiveRow, ""
+            fpgTransaction.SetText 12, fpgTransaction.ActiveRow, ""
+            fpgTransaction.SetText 13, fpgTransaction.ActiveRow, ""
+            fpgTransaction.SetText 14, fpgTransaction.ActiveRow, ""
+            fpgTransaction.SetText 15, fpgTransaction.ActiveRow, ""
+            fpgTransaction.SetText 16, fpgTransaction.ActiveRow, ""
+            fpgTransaction.SetText 17, fpgTransaction.ActiveRow, ""
+            fpgTransaction.SetText 18, fpgTransaction.ActiveRow, ""
+            fpgTransaction.SetText 19, fpgTransaction.ActiveRow, ""
+            fpgTransaction.SetText 20, fpgTransaction.ActiveRow, ""
+            fpgTransaction.SetText 21, fpgTransaction.ActiveRow, ""
+            fpgTransaction.SetText 22, fpgTransaction.ActiveRow, ""
+            fpgTransaction.SetText 23, fpgTransaction.ActiveRow, ""
+            fpgTransaction.SetText 24, fpgTransaction.ActiveRow, ""
+            fpgTransaction.SetText 25, fpgTransaction.ActiveRow, ""
+            fpgTransaction.SetText 26, fpgTransaction.ActiveRow, ""
+            fpgTransaction.SetText 27, fpgTransaction.ActiveRow, ""
+            fpgTransaction.SetText 28, fpgTransaction.ActiveRow, ""
+            fpgTransaction.SetText 29, fpgTransaction.ActiveRow, ""
+            fpgTransaction.SetText 30, fpgTransaction.ActiveRow, ""
+            fpgTransaction.SetText 31, fpgTransaction.ActiveRow, ""
+            fpgTransaction.SetText 34, fpgTransaction.ActiveRow, ""
+            
+            fpgTransaction.SetActiveCell 1, fpgTransaction.ActiveRow
+            fpgTransaction.SetFocus
+               
+            Call GridRowCalculations(fpgTransaction.ActiveRow)
+            Call CalculateTotals
+            
+            Exit Sub
+         End If
+         
+         fpgTransaction.SetText 2, fpgTransaction.ActiveRow, SelArr(1)
+         fpgTransaction.SetText 3, fpgTransaction.ActiveRow, SelArr(2)
+         fpgTransaction.SetText 6, fpgTransaction.ActiveRow, SelArr(3)
+         
+         fpgTransaction.SetText 11, fpgTransaction.ActiveRow, 0#
+         
+         fpgTransaction.SetText 16, fpgTransaction.ActiveRow, SelArr(4)
+         fpgTransaction.SetText 17, fpgTransaction.ActiveRow, SelArr(5)
+         fpgTransaction.SetText 18, fpgTransaction.ActiveRow, SelArr(6)
+         fpgTransaction.SetText 19, fpgTransaction.ActiveRow, SelArr(8)
+         fpgTransaction.SetText 22, fpgTransaction.ActiveRow, SelArr(9)
+         fpgTransaction.SetText 23, fpgTransaction.ActiveRow, SelArr(10)
+         fpgTransaction.SetText 25, fpgTransaction.ActiveRow, SelArr(7)
+         fpgTransaction.SetText 31, fpgTransaction.ActiveRow, SelArr(12)
+         
+         With mrsRatesInformation
+            .ActiveConnection = AppCnn
+            .CursorLocation = adUseClient
+            .LockType = adLockReadOnly
+            .CursorType = adOpenStatic
+            .Source = "SELECT * FROM tblSalDiscCategoryWiseRates Rates INNER JOIN tblSalDiscCategoryWiseRatesDetail " & _
+                      "RatesDtl ON Rates.CompanyID = RatesDtl.CompanyID AND Rates.DiscountCategory = " & _
+                      "RatesDtl.DiscountCategory AND Rates.EffectiveDate = RatesDtl.EffectiveDate WHERE " & _
+                      "RatesDtl.CompanyID = " & Val(gstrOrgID) & " AND FG_ID = " & SelArr(0) & " AND " & _
+                      "RatesDtl.DiscountCategory = 'NORMAL' AND " & _
+                      "RatesDtl.EffectiveDate <= '" & Format(mebSalesEntryDate.text, gstrdbDateFormat) & "' AND " & _
+                      "Authorized = '1' AND BasicRate > 0 ORDER BY RatesDtl.EffectiveDate"
+            .Open
+         End With
+         
+         If mrsRatesInformation.RecordCount > 0 Then
+            mrsRatesInformation.MoveLast
+            
+            fpgTransaction.SetText 7, fpgTransaction.ActiveRow, mrsRatesInformation.Fields("BasicRate").Value
+               
+            fpgTransaction.SetText 8, fpgTransaction.ActiveRow, mrsRatesInformation.Fields("SpecialDiscount").Value
+            
+            fpgTransaction.SetText 20, fpgTransaction.ActiveRow, mrsRatesInformation.Fields("FreightChargesPerBasicUnit").Value
+            fpgTransaction.SetText 21, fpgTransaction.ActiveRow, mrsRatesInformation.Fields("SoapChargesPerCarton").Value
+            fpgTransaction.SetText 24, fpgTransaction.ActiveRow, mrsRatesInformation.Fields("LeakageRate").Value
+            
+         Else
+            fpgTransaction.SetText 7, fpgTransaction.ActiveRow, ""
+            fpgTransaction.SetText 8, fpgTransaction.ActiveRow, ""
+            fpgTransaction.SetText 20, fpgTransaction.ActiveRow, ""
+            fpgTransaction.SetText 21, fpgTransaction.ActiveRow, ""
+            fpgTransaction.SetText 24, fpgTransaction.ActiveRow, ""
+            
+         End If
+         
+         mrsRatesInformation.Close
+         Set mrsRatesInformation = Nothing
+         
+         fpgTransaction.SetActiveCell 4, fpgTransaction.ActiveRow
+         
+         Call GridRowCalculations(fpgTransaction.ActiveRow)
+         Call CalculateTotals
+      
+      End If
+      
+   ElseIf mscSearchCaller = scCustomer Then
+      
+      If Len(mstrSearchedText) > 0 Then
+      
+         SelArr = Split(mstrSearchedText, ";")
+         
+         mebCustomerCode.text = SelArr(0)
+         infCustomerName.Caption = SelArr(1)
+         infCustomerAddress.Caption = SelArr(3)
+         infDistShop.Caption = SelArr(11)
+         
+      End If
+      
+   ElseIf mscSearchCaller = scRateInformation Then
+      
+      If Len(mstrSearchedText) > 0 Then
+         
+         SelArr = Split(mstrSearchedText, ";")
+         
+         fpgTransaction.SetText 7, fpgTransaction.ActiveRow, SelArr(1)
+         fpgTransaction.SetText 8, fpgTransaction.ActiveRow, Format(SelArr(4), "##,##0.000")
+         fpgTransaction.SetText 20, fpgTransaction.ActiveRow, SelArr(2)
+         fpgTransaction.SetText 21, fpgTransaction.ActiveRow, SelArr(3)
+         fpgTransaction.SetText 24, fpgTransaction.ActiveRow, SelArr(5)
+         
+         fpgTransaction.SetActiveCell 7, fpgTransaction.ActiveRow
+         
+         Call GridRowCalculations(fpgTransaction.ActiveRow)
+         Call CalculateTotals
+      
+      End If
+      
+   End If
+End Sub
+
+Private Sub chkSalesProm_Click()
+   If mvarFormMode = enzViewMode Then Exit Sub
+   
+   If chkSalesProm.Value = vbChecked Then
+      mebCustomerCode.text = "99001"
+      infCustomerName.Caption = "SALES PROMOTION"
+      infCustomerAddress.Caption = ""
+      infDistShop.Caption = ""
+      
+      mebCustomerCode.Enabled = False
+      
+      txtDeliveredTo.SetFocus
+      
+   Else
+      Call ClearMskEdBox(mebCustomerCode, mebCustomerCode.Mask)
+      infCustomerName.Caption = ""
+      infCustomerAddress.Caption = ""
+      infDistShop.Caption = ""
+      
+      mebCustomerCode.Enabled = True
+      
+      mebCustomerCode.SetFocus
+      
+   End If
+End Sub
+
+Private Sub cmdUncheck_Click()
+On Error GoTo ErrorHandler
+
+   Dim blnTransAppCnn   As Boolean
+   Dim blnTransAppCnnME As Boolean
+   
+   If Len(Trim(mebSalesEntryID.text)) = 0 Then
+      MsgBox "Sales Invoice No. must be entered properly.", vbExclamation + vbOKOnly, App.ProductName
+      Exit Sub
+   End If
+   
+   If UnCheckMsg() = vbYes Then
+   
+      Screen.MousePointer = vbHourglass
+      
+      AppCnn.BeginTrans
+      blnTransAppCnn = True
+      
+         Call UnCheckSalesInvoice(AppCnn, "BG", mebSalesEntryID.text)
+         
+         Call AddActivity(AppCnn, mstrFrmCaption, enzActivityUnCheck, "BG - " & Right("00000" & mebSalesEntryID.text, 6), gstrMachineName, _
+                          Val(gstrOrgID))
+
+      AppCnn.CommitTrans
+      blnTransAppCnn = False
+      
+      Call ClearFormObjects(Me)
+      Call fpgLockGrid(fpgTransaction, True, True)
+      Call enztb.SetToolbarNewVersion(enzButtonLoad, mUserPriv)
+      Call DisplayDocStatusNewVersion(False, False, True)
+
+      Screen.MousePointer = vbDefault
+
+   End If
+
+   Exit Sub
+
+ErrorHandler:
+   Screen.MousePointer = vbDefault
+
+   If blnTransAppCnn = True Then
+      AppCnn.RollbackTrans
+      blnTransAppCnn = False
+   End If
+   
+   MsgBox "Error Code: " & Err.Number & vbCrLf & _
+          "Error Description: " & Err.Description, vbCritical + vbOKOnly, App.ProductName
+End Sub
+
+Private Sub cmdUnpost_Click()
+On Error GoTo ErrorHandler
+
+   Dim blnTransAppCnn   As Boolean
+   
+   If Len(Trim(mebSalesEntryID.text)) = 0 Then
+      MsgBox "Sales Invoice No. must be entered properly.", vbExclamation + vbOKOnly, App.ProductName
+      Exit Sub
+   End If
+   
+   If UnPostMsg() = vbYes Then
+   
+      Screen.MousePointer = vbHourglass
+      
+      AppCnn.BeginTrans
+      blnTransAppCnn = True
+      
+         Call UnPostSalesInvoice(AppCnn, "BG", mebSalesEntryID.text)
+         
+         Call AddActivity(AppCnn, mstrFrmCaption, enzActivityUnpost, "BG - " & Right("00000" & mebSalesEntryID.text, 6), gstrMachineName, _
+                          Val(gstrOrgID))
+
+      AppCnn.CommitTrans
+      blnTransAppCnn = False
+      
+      cmdUncheck.Enabled = False
+      cmdUnpost.Enabled = False
+      Call ClearFormObjects(Me)
+      Call fpgLockGrid(fpgTransaction, True, True)
+      Call enztb.SetToolbarNewVersion(enzButtonLoad, mUserPriv)
+      Call DisplayDocStatusNewVersion(False, False, True)
+
+      Screen.MousePointer = vbDefault
+
+   End If
+
+   Exit Sub
+
+ErrorHandler:
+   Screen.MousePointer = vbDefault
+
+   If blnTransAppCnn = True Then
+      AppCnn.RollbackTrans
+      blnTransAppCnn = False
+   End If
+   
+   MsgBox "Error Code: " & Err.Number & vbCrLf & _
+          "Error Description: " & Err.Description, vbCritical + vbOKOnly, App.ProductName
+End Sub
+
+Private Sub Command1_Click()
+'''   Dim rs As New ADODB.Recordset
+'''
+'''   Dim intInvNo As Integer
+'''
+'''   rs.Open "SELECT InvNo, InvDate, Customer FROM _SalesData ORDER BY InvNo", AppCnn, adOpenStatic, adLockReadOnly
+'''
+'''   rs.MoveFirst
+'''
+'''   Do While rs.EOF = False
+'''
+'''      intInvNo = NEW_GetNewSalesEntryID_Typewise("BG")
+'''
+'''      AppCnn.Execute ("INSERT INTO tblSalSalesEntry(CompanyID, FinYear, SalesEntryType, SalesEntryID, BillType, SalesEntryDate, OrderID, " & _
+'''                 "VehicleRegNo, CustomerID, TotalExcSTValue, TotalSEDValue, TotalSTValue, TotalSTValue_17, TotalSTValue_03, TotalIncSTValue, " & _
+'''                 "TotalDiscount1_Percentage_Value, TotalDiscount2_PerPack_Value, NetAmount, TotalWeightInTons, TotalBGheenCOilWeight, " & _
+'''                 "TotalFreightCharges, TotalSoapCharges, TotalEmptyCartons, FreightApplied, StockLocationID, DeliveredTo, IsIncludeInIncentiveBulk, " & _
+'''                 "IsIncludeInIncentiveConsumer, IsIncludeInIncentiveRSO, CreditDays, LastModifiedBy, Checked, CheckedBy, Authorized, AuthorizedBy, " & _
+'''                 "Station, VouType, VouNo, Station1, VouType1, VouNo1, TotalCommission, IncomeTaxPercentage, IncomeTax, IncomeTaxIncValue, " & _
+'''                 "SalesDiscounts, CustCode_SalesProm, SK_STPercentage, Warehouse, CarriageCharges, Currency, CurrencyRate) VALUES(" & _
+'''                 Val(gstrOrgID) & ", '" & gstrFinancialYear & "', 'BG', " & intInvNo & ", 'SI', " & _
+'''                 "'" & Format(rs.Fields("InvDate").Value, gstrdbDateFormat) & "', NULL, '" & rs.Fields("InvNo").Value & "', NULL, 0, " & _
+'''                 "0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, " & _
+'''                 "0, 0, '0', 1, '" & rs.Fields("Customer").Value & "', '0', '0', '0', 0, " & _
+'''                 "'" & gstrUser & "', '0', 'N/A', '0', 'N/A', NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, 0, 0, 'N', NULL, 0, " & _
+'''                 "'Harlington Storage # 1', 0, '', 0)")
+'''
+'''
+'''      rs.MoveNext
+'''   Loop
+'''
+'''   MsgBox "Done!!!"
+
+   Dim rs As New ADODB.Recordset
+   
+   Dim intInvNo As Integer
+   
+   rs.Open "SELECT * FROM tblSalSalesEntry AS SE INNER JOIN tblSalSalesEntryDetail AS SEDtl ON SE.CompanyID = SEDtl.CompanyID AND SE.FinYear = " & _
+           "SEDtl.FinYear AND SE.BillType = SEDtl.BillType AND SE.SalesEntryType = SEDtl.SalesEntryType AND SE.SalesEntryID = SEDtl.SalesEntryID " & _
+           "ORDER BY SEDtl.FinYear, SEDtl.SalesEntryID, FG_ID", AppCnn, adOpenStatic, adLockReadOnly
+   
+   rs.MoveFirst
+   
+   Do While rs.EOF = False
+      
+      AppCnn.Execute ("INSERT INTO tblInvStockLedgerStkLoc(CompanyID, FG_ID, StockLocationID, DocumentType, DocumentSubType, DocumentNo, " & _
+                      "DocumentDate, CustomerID, QtyReceipt, QtyIssue, PricePerUnit, Amount) VALUES(" & Val(gstrOrgID) & ", " & _
+                      rs.Fields("FG_ID").Value & ", 3, '010', 'FG', '" & Right("00000" & rs.Fields("SalesEntryID").Value, 6) & "', " & _
+                      "'" & Format(rs.Fields("SalesEntryDate").Value, gstrdbDateFormat) & "', '" & rs.Fields("CustomerID").Value & "', 0, " & _
+                      Val(rs.Fields("NoOfPacks").Value) & ", " & Val(rs.Fields("BasicRate").Value) & ", " & _
+                      Val(Format(rs.Fields("ExcSTValue").Value, "####0.00")) & ")")
+         
+      rs.MoveNext
+   Loop
+   
+   MsgBox "Done!!!"
+End Sub
+
+Private Sub enztb_ClickCheck()
+On Error GoTo ErrorHandler
+
+   Dim blnTransAppCnn   As Boolean
+
+   If CheckMsg() = vbYes Then
+
+      Screen.MousePointer = vbHourglass
+   
+      AppCnn.BeginTrans
+      blnTransAppCnn = True
+
+         AppCnn.Execute ("UPDATE " & mstrSalesTableName & " SET Checked = '1', CheckedBy = '" & gstrUser & "', CheckedDate = getDate() " & _
+                         " WHERE CompanyID = " & Val(gstrOrgID) & " AND FinYear = '" & gstrFinancialYear & "' AND BillType = 'SI' AND " & _
+                         "SalesEntryType = 'BG' AND SalesEntryID = " & mebSalesEntryID.text)
+
+                         
+         Call AddActivity(AppCnn, mstrFrmCaption, enzActivityCheck, "BG - " & Right("00000" & mebSalesEntryID.text, 6), gstrMachineName, Val(gstrOrgID))
+
+      AppCnn.CommitTrans
+      blnTransAppCnn = False
+      
+      Call ClearFormObjects(Me)
+      Call fpgLockGrid(fpgTransaction, True, True)
+      Call enztb.SetToolbarNewVersion(enzButtonLoad, mUserPriv)
+      Call DisplayDocStatusNewVersion(False, False, True)
+
+      Screen.MousePointer = vbDefault
+
+   End If
+
+   Exit Sub
+
+ErrorHandler:
+   Screen.MousePointer = vbDefault
+
+   If blnTransAppCnn = True Then
+      AppCnn.RollbackTrans
+      blnTransAppCnn = False
+   End If
+   
+   MsgBox "Error Code: " & Err.Number & vbCrLf & _
+          "Error Description: " & Err.Description, vbCritical + vbOKOnly, App.ProductName
+End Sub
+
+Private Sub enztb_ClickPost()
+'''On Error GoTo ErrorHandler
+
+   Dim blnTransAppCnn   As Boolean
+   
+   Dim tmprs As New ADODB.Recordset
+   
+   tmprs.Open "SELECT * FROM " & mstrSalesTableName & " WHERE CompanyID = " & Val(gstrOrgID) & " AND " & _
+              "FinYear = '" & gstrFinancialYear & "' AND BillType = 'SI' AND " & _
+              "SalesEntryType = 'BG' AND SalesEntryID = " & mebSalesEntryID.text, AppCnn, adOpenStatic, adLockReadOnly
+                              
+   If tmprs.RecordCount > 0 Then
+      If CBool(tmprs.Fields("Authorized").Value) = True Then
+         MsgBox "Sales Invoice already posted by: " & vbCrLf & vbCrLf & tmprs.Fields("AuthorizedBy").Value & " @ " & _
+                tmprs.Fields("AuthorizedDate").Value & ".", vbExclamation + vbOKOnly, App.ProductName
+         Exit Sub
+      End If
+   End If
+   
+   If PostMsg() = vbYes Then
+
+      Screen.MousePointer = vbHourglass
+
+      AppCnn.BeginTrans
+      blnTransAppCnn = True
+      
+         Call PostingProcess(AppCnn, "BG", mebSalesEntryID.text)
+         
+         Call AddActivity(AppCnn, mstrFrmCaption, enzActivityPost, "BG - " & Right("00000" & mebSalesEntryID.text, 6), gstrMachineName, Val(gstrOrgID))
+
+      AppCnn.CommitTrans
+      blnTransAppCnn = False
+      
+      cmdUncheck.Enabled = False
+      cmdUnpost.Enabled = True
+      Call enztb.SetToolbarNewVersion(enzButtonLoad, mUserPriv)
+      Call DisplayDocStatusNewVersion(False, False, True)
+      enztb.Preview = True
+      
+      Screen.MousePointer = vbDefault
+
+   End If
+
+   Exit Sub
+
+ErrorHandler:
+   Screen.MousePointer = vbDefault
+
+   If blnTransAppCnn = True Then
+      AppCnn.RollbackTrans
+      blnTransAppCnn = False
+   End If
+
+   MsgBox "Error Code: " & Err.Number & vbCrLf & _
+          "Error Description: " & Err.Description, vbCritical + vbOKOnly, App.ProductName
+End Sub
+
+Private Sub enztb_ClickPreview()
+   Dim rptCommInvCC As New arSalInvCommercialInvoice
+   
+   Screen.MousePointer = vbHourglass
+   
+   Call PrintCommercialInvoice(rptCommInvCC, "CUSTOMER COPY", False, False, IIf(chkExport.Value = vbChecked, True, False))
+   
+   Screen.MousePointer = vbDefault
+End Sub
+
+Private Sub ExportReport(pstrExportOption As String, pstrFileName As String, prptReport As ActiveReport)
+   Dim oPDF As New ARExportPDF
+   
+   Dim objFSO  As New FileSystemObject
+   
+   If objFSO.FolderExists(App.Path & "\_Sales Invoices PDF") = False Then
+      objFSO.CreateFolder (App.Path & "\_Sales Invoices PDF")
+   End If
+   
+   oPDF.Filename = App.Path & "\_Sales Invoices PDF\" & pstrFileName & ".pdf"
+   
+   prptReport.Export oPDF
+End Sub
+
+Private Sub Form_KeyDown(KeyCode As Integer, Shift As Integer)
+   If KeyCode = vbKeyN And Shift = 2 And enztb.AddNew = True Then
+      Call enztb_ClickNew
+         
+   ElseIf KeyCode = vbKeyE And Shift = 2 And enztb.Edit = True Then
+      Call enztb_ClickEdit
+      
+   ElseIf KeyCode = vbKeyDelete And Shift = 2 And enztb.Delete = True Then
+      Call enztb_ClickDelete
+      
+   ElseIf KeyCode = vbKeyK And Shift = 2 And enztb.Check = True Then
+      Call enztb_ClickCheck
+      
+   ElseIf KeyCode = vbKeyO And Shift = 2 And enztb.Post = True Then
+      Call enztb_ClickPost
+      
+   ElseIf KeyCode = vbKeyF3 And enztb.Find = True Then
+      Call enztb_ClickFind
+      
+   ElseIf KeyCode = vbKeyF12 And enztb.Save = True Then
+      Call enztb_ClickSave
+      
+   End If
+End Sub
+
+Private Sub Form_KeyUp(KeyCode As Integer, Shift As Integer)
+   If KeyCode = vbKeyEscape And enztb.Undo = True Then
+      Call enztb_ClickUndo
+   End If
+End Sub
+
+Private Sub Form_KeyPress(KeyAscii As Integer)
+   If KeyAscii = vbKeyReturn Then
+      If Not TypeOf ActiveControl Is vaSpread Then
+      
+         Sendkeys vbTab
+      
+      End If
+   End If
+End Sub
+
+Private Sub Form_Load()
+   Call CenterToMDI(mdiMain, Me)
+
+   mstrFrmCaption = "Sales Invoice"
+
+   mebSalesEntryDate.Mask = gstrDateInputMask
+   mebCustomerCode.Mask = gsobstrCustomerIDMask
+   
+   mvarFormMode = enzViewMode
+   Call SetFormMode
+   
+   Call SetGridLayout
+   Call SetObjectsState(Me, False)
+   
+   Call fpgLockGrid(fpgTransaction, True, True)
+   Call ClearFormObjects(Me)
+   Call CalculateTotals
+
+'''   cboWarehouse.Clear
+'''   cboWarehouse.AddItem "[ Select One ]"
+'''   cboWarehouse.AddItem "Harlington Storage # 1"
+'''   cboWarehouse.ItemData(cboWarehouse.NewIndex) = 1
+'''   cboWarehouse.AddItem "Harlington StorageÂ #Â 9"
+'''   cboWarehouse.ItemData(cboWarehouse.NewIndex) = 2
+'''   cboWarehouse.AddItem "Uxbridge Storage"
+'''   cboWarehouse.ItemData(cboWarehouse.NewIndex) = 3
+'''   cboWarehouse.ListIndex = 0
+   
+   Call enztb.SetToolbarNewVersion(enzButtonLoad, mUserPriv)
+   Call DisplayDocStatusNewVersion(False, False, True)
+   
+   If gstrUser = UCase("ADMINISTRATOR") Or mUserPriv.CanCheck = True Then
+      cmdUncheck.Visible = True
+   Else
+      cmdUncheck.Visible = False
+   End If
+   
+   If gstrUser = UCase("ADMINISTRATOR") Then
+      cmdUnpost.Visible = True
+   Else
+      cmdUnpost.Visible = False
+   End If
+   
+'''   'SHOW / HIDE APPLY DISCOUNT ACCORDING TO RIGHTS.
+   Dim objUPriv   As enzCPrivilege
+
+   Set objUPriv = GetAccessRights("optSalBillRateChange")
+End Sub
+
+Private Sub enztb_ClickNew()
+   Call SetObjectsState(Me, True)
+   Call ClearFormObjects(Me)
+   Call fpgLockGrid(fpgTransaction, False, False)
+
+   With fpgTransaction
+      .MaxRows = 0
+      .MaxRows = 1
+      .SetActiveCell 1, 1
+   End With
+
+   mvarFormMode = enzAddMode
+   Call SetFormMode
+
+   mebSalesEntryID.Enabled = False
+   
+'''   Call SetComboListIndex(Me)
+   
+   Call enztb.SetToolbarNewVersion(enzButtonNew, mUserPriv)
+   Call DisplayDocStatusNewVersion(False, False, True)
+   
+   mebSalesEntryDate.text = Format(Date, gstrDateFormat)
+   mebSalesEntryDate.SetFocus
+End Sub
+
+Private Sub enztb_ClickEdit()
+   Call SetObjectsState(Me, True)
+   Call fpgLockGrid(fpgTransaction, False, False)
+   
+   mvarFormMode = enzEditMode
+   Call SetFormMode
+
+   mebSalesEntryID.Enabled = False
+
+   Call enztb.SetToolbarNewVersion(enzButtonEdit, mUserPriv)
+End Sub
+
+Private Sub enztb_ClickUndo()
+   If CancelMsg() = vbNo Then Exit Sub
+
+   mvarFormMode = enzViewMode
+   Call SetFormMode
+
+   Call ClearFormObjects(Me)
+   Call SetObjectsState(Me, False)
+   Call fpgLockGrid(fpgTransaction, True, True)
+   Call enztb.SetToolbarNewVersion(enzButtonLoad, mUserPriv)
+   Call DisplayDocStatusNewVersion(False, False, True)
+End Sub
+
+Private Sub enztb_ClickDelete()
+On Error GoTo ErrorHandle
+
+   Dim blnTransAppCnn   As Boolean
+
+   mvarFormMode = enzDeleteMode
+   Call SetFormMode
+
+   If DeleteMsg() = vbYes Then
+
+      Screen.MousePointer = vbHourglass
+
+      AppCnn.BeginTrans
+      blnTransAppCnn = True
+
+         AppCnn.Execute "DELETE FROM " & mstrSalesTableName & "Detail WHERE CompanyID = " & Val(gstrOrgID) & " AND " & _
+                        "FinYear = '" & gstrFinancialYear & "' AND BillType = 'SI' AND " & _
+                        "SalesEntryType = 'BG' AND SalesEntryID = " & mebSalesEntryID.text
+
+         AppCnn.Execute "DELETE FROM " & mstrSalesTableName & " WHERE CompanyID = " & Val(gstrOrgID) & " AND " & _
+                        "FinYear = '" & gstrFinancialYear & "' AND BillType = 'SI' AND " & _
+                        "SalesEntryType = 'BG' AND SalesEntryID = " & mebSalesEntryID.text
+                        
+         Call AddActivity(AppCnn, mstrFrmCaption, enzActivityDelete, "BG - " & Right("00000" & mebSalesEntryID.text, 6), gstrMachineName, _
+                          Val(gstrOrgID))
+
+      AppCnn.CommitTrans
+      blnTransAppCnn = False
+
+      Screen.MousePointer = vbDefault
+
+   End If
+
+   Call ClearFormObjects(Me)
+
+   With fpgTransaction
+      .ClearRange 1, 1, .MaxCols, .MaxRows, True
+      .MaxRows = 2
+   End With
+
+   Call enztb.SetToolbarNewVersion(enzButtonLoad, mUserPriv)
+   Call DisplayDocStatusNewVersion(False, False, True)
+
+   mvarFormMode = enzViewMode
+   Call SetFormMode
+
+   Exit Sub
+
+ErrorHandle:
+   If blnTransAppCnn = True Then
+      AppCnn.RollbackTrans
+      blnTransAppCnn = False
+   End If
+
+   Select Case Err.Number
+
+      Case -2147217873
+         MsgBox "System is unable to perform this action becuase related record exist in databae.", _
+                vbCritical + vbOKOnly, App.ProductName
+
+      Case Else
+         MsgBox "Error Code: " & Err.Number & vbCrLf & _
+                "Error Description: " & Err.Description, vbCritical + vbOKOnly, App.ProductName
+
+   End Select
+End Sub
+
+Private Sub enztb_ClickSave()
+   If IsDate(mebSalesEntryDate.text) = False Then
+      MsgBox "Sales Invoice Date is not valid.", vbExclamation + vbOKOnly, App.ProductName
+      mebSalesEntryDate.SetFocus
+      Exit Sub
+   End If
+
+   If IsDateValid(mebSalesEntryDate) = False Then
+      mebSalesEntryDate.SetFocus
+      Exit Sub
+   End If
+
+   If IsDateInFNYR(mebSalesEntryDate, gdtmACCPRDStart, gdtmACCPRDEnd) = False Then
+      Exit Sub
+   End If
+
+   If gblnIsEntryDateApplied = True And UCase(gstrUser) <> UCase("ADMINISTRATOR") And _
+      mvarFormMode = enzAddMode Then
+      
+      If Format(mebSalesEntryDate.text, gstrDateFormat) <> Format(gdtmSALES, gstrDateFormat) Then
+         MsgBox "Check your Entry Date.", vbExclamation + vbOKOnly, App.ProductName
+         mebSalesEntryDate.SetFocus
+         Exit Sub
+      End If
+   End If
+   
+'''   If IsObjectEmpty(cboWarehouse, "Stock Location must be selected.", vbExclamation + vbOKOnly) = True Then
+'''      cboWarehouse.SetFocus
+'''      Exit Sub
+'''   End If
+   
+   If Len(Trim(mebCustomerCode.text)) < Len(mebCustomerCode.Mask) Or Len(infCustomerName.Caption) = 0 Then
+      MsgBox "Customer Code must be entered properly.", vbExclamation + vbOKOnly, App.ProductName
+      mebCustomerCode.SetFocus
+      Exit Sub
+   End If
+   
+   If ValidateFPGrid() = False Then
+      Exit Sub
+   End If
+
+   If SaveMsg() = vbNo Then Exit Sub
+
+   If ApplySavingRoutine(mvarFormMode) = False Then Exit Sub
+
+   mvarFormMode = enzViewMode
+   Call SetFormMode
+
+   Call ClearFormObjects(Me)
+   Call SetObjectsState(Me, False)
+   Call fpgLockGrid(fpgTransaction, True, True)
+   Call enztb.SetToolbarNewVersion(enzButtonLoad, mUserPriv)
+   Call DisplayDocStatusNewVersion(False, False, True)
+End Sub
+
+Private Sub enztb_ClickFind()
+   Dim TempStr       As String
+   
+   Dim mobjColumns   As New enzCSearchColumn
+   Dim mobjSearch    As New enzCSearch
+   Dim objfrmSearch  As New frmSftSearch
+   
+   TempStr = "SELECT SalesEntryType, SalesEntryID, SalesEntryDate, VehicleRegNo, SE.CustomerID, CustomerCoName, TotalExcSTValue, TotalSTValue, " & _
+             "TotalIncSTValue, REPLACE(CONVERT(VARCHAR, CONVERT(MONEY, NetAmount), 1), '.00', '') AS NetAmount, TotalWeightInTons, " & _
+             "TotalBGheenCOilWeight, TotalFreightCharges, TotalSoapCharges, TotalEmptyCartons, Checked, Authorized, DiscCategory, Address, " & _
+             "IntegDefAccID, FreightApplied, OrderID, TotalSEDValue, TotalDiscount1_Percentage_Value, TotalDiscount2_PerPack_Value, " & _
+             "SE.StockLocationID, DeliveredTo, IsIncludeInIncentiveBulk, IsIncludeInIncentiveConsumer, IsTaxesApplied, StockLocation, CreditDays, " & _
+             "CreditLimit, IsIncludeInIncentiveRSO, TotalCommission, IncomeTax, IncomeTaxIncValue, DespatchDate, SE.IncomeTaxPercentage, " & _
+             "DiscCategory_BluWater, RateCategory_BluWater, CustomerStatus, SalesDiscounts, CustCode_SalesProm, SK_STPercentage, TotalSTValue_17, " & _
+             "TotalSTValue_03, Warehouse, CarriageCharges, Currency, CurrencyRate, TotalVATValue, IsDistShop, " & _
+             "CASE WHEN IsDistShop = 'Y' THEN 'DIST. SHOP' ELSE '-' END AS DistShop FROM " & mstrSalesTableName & " AS SE INNER JOIN " & _
+             "tblSalCustomerInfo AS Cust ON SE.CompanyID = Cust.CompanyID AND SE.CustomerID = Cust.CustomerID LEFT OUTER JOIN " & _
+             "tblSalStockLocation AS Stk_Loc ON SE.StockLocationID = Stk_Loc.StockLocationID WHERE SE.CompanyID = " & Val(gstrOrgID) & " AND " & _
+             "SE.FinYear = '" & gstrFinancialYear & "' AND SE.BillType = 'SI' AND Is19LtrInvoice = 'N' AND " & _
+             "SalesEntryDate >= '" & Format(gdtmACCPRDStart, gstrdbDateFormat) & "' AND " & _
+             "SalesEntryDate <= '" & Format(gdtmACCPRDEnd, gstrdbDateFormat) & "' ORDER BY SalesEntryDate"
+             
+             '''SalesEntryType, SalesEntryID DESC, SalesEntryDate
+             
+   mobjColumns.Caption = "S.I TYPE"
+   mobjColumns.ColumnWidth = 950
+   mobjColumns.FieldName = "SalesEntryType"
+   mobjColumns.InSearchCombo = True
+   mobjColumns.Selectable = True
+   mobjColumns.Alignment = LeftAlign
+   mobjColumns.CaptionAlignment = LeftAlign
+   mobjColumns.DataType = enzColText
+   mobjColumns.InputMask = ""
+   mobjSearch.Add mobjColumns
+   
+   mobjColumns.Caption = "S.I NO."
+   mobjColumns.ColumnWidth = 950
+   mobjColumns.FieldName = "SalesEntryID"
+   mobjColumns.InSearchCombo = True
+   mobjColumns.Selectable = True
+   mobjColumns.Alignment = LeftAlign
+   mobjColumns.CaptionAlignment = LeftAlign
+   mobjColumns.DataType = enzColInteger
+   mobjColumns.InputMask = ""
+   mobjSearch.Add mobjColumns
+
+   mobjColumns.Caption = "S.I DATE"
+   mobjColumns.ColumnWidth = 1200
+   mobjColumns.FieldName = "SalesEntryDate"
+   mobjColumns.InSearchCombo = True
+   mobjColumns.Selectable = True
+   mobjColumns.Alignment = LeftAlign
+   mobjColumns.CaptionAlignment = LeftAlign
+   mobjColumns.DataType = enzColDate
+   mobjColumns.InputMask = gstrDateInputMask
+   mobjSearch.Add mobjColumns
+   
+   mobjColumns.Caption = "Vehicle Reg. No."
+   mobjColumns.ColumnWidth = 0
+   mobjColumns.FieldName = "VehicleRegNo"
+   mobjColumns.InSearchCombo = False
+   mobjColumns.Selectable = True
+   mobjColumns.Alignment = LeftAlign
+   mobjColumns.CaptionAlignment = LeftAlign
+   mobjColumns.DataType = enzColText
+   mobjColumns.InputMask = ""
+   mobjSearch.Add mobjColumns
+
+   mobjColumns.Caption = "CODE"
+   mobjColumns.ColumnWidth = 1100
+   mobjColumns.FieldName = "CustomerID"
+   mobjColumns.InSearchCombo = True
+   mobjColumns.Selectable = True
+   mobjColumns.Alignment = LeftAlign
+   mobjColumns.CaptionAlignment = LeftAlign
+   mobjColumns.DataType = enzColText
+   mobjColumns.InputMask = gsobstrCustomerIDMask
+   mobjSearch.Add mobjColumns
+   
+   mobjColumns.Caption = "CUSTOMER NAME"
+   mobjColumns.ColumnWidth = 4000
+   mobjColumns.FieldName = "CustomerCoName"
+   mobjColumns.InSearchCombo = True
+   mobjColumns.Selectable = True
+   mobjColumns.DataType = enzColText
+   mobjColumns.Alignment = LeftAlign
+   mobjColumns.CaptionAlignment = LeftAlign
+   mobjColumns.InputMask = ""
+   mobjSearch.Add mobjColumns
+   
+   mobjColumns.Caption = "Total Exc. S.T Value"
+   mobjColumns.ColumnWidth = 0
+   mobjColumns.FieldName = "TotalExcSTValue"
+   mobjColumns.InSearchCombo = False
+   mobjColumns.Selectable = True
+   mobjColumns.Alignment = RightAlign
+   mobjColumns.CaptionAlignment = RightAlign
+   mobjColumns.DataType = enzColDouble
+   mobjColumns.InputMask = ""
+   mobjSearch.Add mobjColumns
+   
+   mobjColumns.Caption = "Total S.T Value"
+   mobjColumns.ColumnWidth = 0
+   mobjColumns.FieldName = "TotalSTValue"
+   mobjColumns.InSearchCombo = False
+   mobjColumns.Selectable = True
+   mobjColumns.Alignment = RightAlign
+   mobjColumns.CaptionAlignment = RightAlign
+   mobjColumns.DataType = enzColDouble
+   mobjColumns.InputMask = ""
+   mobjSearch.Add mobjColumns
+   
+   mobjColumns.Caption = "Total Inc. S.T Value"
+   mobjColumns.ColumnWidth = 0
+   mobjColumns.FieldName = "TotalIncSTValue"
+   mobjColumns.InSearchCombo = False
+   mobjColumns.Selectable = True
+   mobjColumns.Alignment = RightAlign
+   mobjColumns.CaptionAlignment = RightAlign
+   mobjColumns.DataType = enzColDouble
+   mobjColumns.InputMask = ""
+   mobjSearch.Add mobjColumns
+   
+   mobjColumns.Caption = "NET AMOUNT"
+   mobjColumns.ColumnWidth = 1200
+   mobjColumns.FieldName = "NetAmount"
+   mobjColumns.InSearchCombo = False
+   mobjColumns.Selectable = True
+   mobjColumns.Alignment = RightAlign
+   mobjColumns.CaptionAlignment = RightAlign
+   mobjColumns.DataType = enzColDouble
+   mobjColumns.InputMask = ""
+   mobjSearch.Add mobjColumns
+   
+   mobjColumns.Caption = "Total Weight In Tons"
+   mobjColumns.ColumnWidth = 0
+   mobjColumns.FieldName = "TotalWeightInTons"
+   mobjColumns.InSearchCombo = False
+   mobjColumns.Selectable = True
+   mobjColumns.Alignment = RightAlign
+   mobjColumns.CaptionAlignment = RightAlign
+   mobjColumns.DataType = enzColDouble
+   mobjColumns.InputMask = ""
+   mobjSearch.Add mobjColumns
+   
+   mobjColumns.Caption = "Total B. Ghee n C. Oil Weight"
+   mobjColumns.ColumnWidth = 0
+   mobjColumns.FieldName = "TotalBGheenCOilWeight"
+   mobjColumns.InSearchCombo = False
+   mobjColumns.Selectable = True
+   mobjColumns.Alignment = RightAlign
+   mobjColumns.CaptionAlignment = RightAlign
+   mobjColumns.DataType = enzColDouble
+   mobjColumns.InputMask = ""
+   mobjSearch.Add mobjColumns
+   
+   mobjColumns.Caption = "Total Freight Charges"
+   mobjColumns.ColumnWidth = 0
+   mobjColumns.FieldName = "TotalFreightCharges"
+   mobjColumns.InSearchCombo = False
+   mobjColumns.Selectable = True
+   mobjColumns.Alignment = RightAlign
+   mobjColumns.CaptionAlignment = RightAlign
+   mobjColumns.DataType = enzColDouble
+   mobjColumns.InputMask = ""
+   mobjSearch.Add mobjColumns
+   
+   mobjColumns.Caption = "Total Soap Charges"
+   mobjColumns.ColumnWidth = 0
+   mobjColumns.FieldName = "TotalSoapCharges"
+   mobjColumns.InSearchCombo = False
+   mobjColumns.Selectable = True
+   mobjColumns.Alignment = RightAlign
+   mobjColumns.CaptionAlignment = RightAlign
+   mobjColumns.DataType = enzColDouble
+   mobjColumns.InputMask = ""
+   mobjSearch.Add mobjColumns
+   
+   mobjColumns.Caption = "Total Empty Cartons"
+   mobjColumns.ColumnWidth = 0
+   mobjColumns.FieldName = "TotalEmptyCartons"
+   mobjColumns.InSearchCombo = False
+   mobjColumns.Selectable = True
+   mobjColumns.Alignment = RightAlign
+   mobjColumns.CaptionAlignment = RightAlign
+   mobjColumns.DataType = enzColDouble
+   mobjColumns.InputMask = ""
+   mobjSearch.Add mobjColumns
+
+   mobjColumns.Caption = "Checked"
+   mobjColumns.ColumnWidth = 0
+   mobjColumns.FieldName = "Checked"
+   mobjColumns.InSearchCombo = False
+   mobjColumns.Selectable = True
+   mobjColumns.Alignment = LeftAlign
+   mobjColumns.CaptionAlignment = LeftAlign
+   mobjColumns.DataType = enzColBoolean
+   mobjColumns.InputMask = ""
+   mobjSearch.Add mobjColumns
+
+   mobjColumns.Caption = "Authorized"
+   mobjColumns.ColumnWidth = 0
+   mobjColumns.FieldName = "Authorized"
+   mobjColumns.InSearchCombo = False
+   mobjColumns.Selectable = True
+   mobjColumns.Alignment = LeftAlign
+   mobjColumns.CaptionAlignment = LeftAlign
+   mobjColumns.DataType = enzColBoolean
+   mobjColumns.InputMask = ""
+   mobjSearch.Add mobjColumns
+   
+   mobjColumns.Caption = "Disc. Category"
+   mobjColumns.ColumnWidth = 0
+   mobjColumns.FieldName = "DiscCategory"
+   mobjColumns.InSearchCombo = False
+   mobjColumns.Selectable = True
+   mobjColumns.DataType = enzColText
+   mobjColumns.Alignment = LeftAlign
+   mobjColumns.CaptionAlignment = LeftAlign
+   mobjColumns.InputMask = ""
+   mobjSearch.Add mobjColumns
+   
+   mobjColumns.Caption = "Address"
+   mobjColumns.ColumnWidth = 0
+   mobjColumns.FieldName = "Address"
+   mobjColumns.InSearchCombo = False
+   mobjColumns.Selectable = True
+   mobjColumns.DataType = enzColText
+   mobjColumns.Alignment = LeftAlign
+   mobjColumns.CaptionAlignment = LeftAlign
+   mobjColumns.InputMask = ""
+   mobjSearch.Add mobjColumns
+   
+   mobjColumns.Caption = "Integ. Def. Acc. ID"
+   mobjColumns.ColumnWidth = 0
+   mobjColumns.FieldName = "IntegDefAccID"
+   mobjColumns.InSearchCombo = False
+   mobjColumns.Selectable = True
+   mobjColumns.Alignment = LeftAlign
+   mobjColumns.CaptionAlignment = LeftAlign
+   mobjColumns.DataType = enzColText
+   mobjColumns.InputMask = gsobstrAccIDMask
+   mobjSearch.Add mobjColumns
+   
+   mobjColumns.Caption = "Freight Applied"
+   mobjColumns.ColumnWidth = 0
+   mobjColumns.FieldName = "FreightApplied"
+   mobjColumns.InSearchCombo = False
+   mobjColumns.Selectable = True
+   mobjColumns.Alignment = LeftAlign
+   mobjColumns.CaptionAlignment = LeftAlign
+   mobjColumns.DataType = enzColBoolean
+   mobjColumns.InputMask = ""
+   mobjSearch.Add mobjColumns
+   
+   mobjColumns.Caption = "Sales Order No."
+   mobjColumns.ColumnWidth = 0
+   mobjColumns.FieldName = "OrderID"
+   mobjColumns.InSearchCombo = False
+   mobjColumns.Selectable = True
+   mobjColumns.Alignment = LeftAlign
+   mobjColumns.CaptionAlignment = LeftAlign
+   mobjColumns.DataType = enzColInteger
+   mobjColumns.InputMask = ""
+   mobjSearch.Add mobjColumns
+   
+   mobjColumns.Caption = "Total S.E.D Value"
+   mobjColumns.ColumnWidth = 0
+   mobjColumns.FieldName = "TotalSEDValue"
+   mobjColumns.InSearchCombo = False
+   mobjColumns.Selectable = True
+   mobjColumns.Alignment = RightAlign
+   mobjColumns.CaptionAlignment = RightAlign
+   mobjColumns.DataType = enzColDouble
+   mobjColumns.InputMask = ""
+   mobjSearch.Add mobjColumns
+   
+   mobjColumns.Caption = "Total Discount1 Percentage Value"
+   mobjColumns.ColumnWidth = 0
+   mobjColumns.FieldName = "TotalDiscount1_Percentage_Value"
+   mobjColumns.InSearchCombo = False
+   mobjColumns.Selectable = True
+   mobjColumns.Alignment = RightAlign
+   mobjColumns.CaptionAlignment = RightAlign
+   mobjColumns.DataType = enzColDouble
+   mobjColumns.InputMask = ""
+   mobjSearch.Add mobjColumns
+   
+   mobjColumns.Caption = "Total Discount2 PerPack Value"
+   mobjColumns.ColumnWidth = 0
+   mobjColumns.FieldName = "TotalDiscount2_PerPack_Value"
+   mobjColumns.InSearchCombo = False
+   mobjColumns.Selectable = True
+   mobjColumns.Alignment = RightAlign
+   mobjColumns.CaptionAlignment = RightAlign
+   mobjColumns.DataType = enzColDouble
+   mobjColumns.InputMask = ""
+   mobjSearch.Add mobjColumns
+   
+   mobjColumns.Caption = "Stock Location ID"
+   mobjColumns.ColumnWidth = 0
+   mobjColumns.FieldName = "StockLocationID"
+   mobjColumns.InSearchCombo = False
+   mobjColumns.Selectable = True
+   mobjColumns.Alignment = LeftAlign
+   mobjColumns.CaptionAlignment = LeftAlign
+   mobjColumns.DataType = enzColInteger
+   mobjColumns.InputMask = ""
+   mobjSearch.Add mobjColumns
+   
+   mobjColumns.Caption = "DELIVERED TO"
+   mobjColumns.ColumnWidth = 2500
+   mobjColumns.FieldName = "DeliveredTo"
+   mobjColumns.InSearchCombo = True
+   mobjColumns.Selectable = True
+   mobjColumns.DataType = enzColText
+   mobjColumns.Alignment = LeftAlign
+   mobjColumns.CaptionAlignment = LeftAlign
+   mobjColumns.InputMask = ""
+   mobjSearch.Add mobjColumns
+   
+   mobjColumns.Caption = "Is Include In Incentive - Bulk"
+   mobjColumns.ColumnWidth = 0
+   mobjColumns.FieldName = "IsIncludeInIncentiveBulk"
+   mobjColumns.InSearchCombo = False
+   mobjColumns.Selectable = True
+   mobjColumns.Alignment = LeftAlign
+   mobjColumns.CaptionAlignment = LeftAlign
+   mobjColumns.DataType = enzColBoolean
+   mobjColumns.InputMask = ""
+   mobjSearch.Add mobjColumns
+   
+   mobjColumns.Caption = "Is Include In Incentive - Consumer"
+   mobjColumns.ColumnWidth = 0
+   mobjColumns.FieldName = "IsIncludeInIncentiveConsumer"
+   mobjColumns.InSearchCombo = False
+   mobjColumns.Selectable = True
+   mobjColumns.Alignment = LeftAlign
+   mobjColumns.CaptionAlignment = LeftAlign
+   mobjColumns.DataType = enzColBoolean
+   mobjColumns.InputMask = ""
+   mobjSearch.Add mobjColumns
+   
+   mobjColumns.Caption = "Is Taxes Applied"
+   mobjColumns.ColumnWidth = 0
+   mobjColumns.FieldName = "IsTaxesApplied"
+   mobjColumns.InSearchCombo = False
+   mobjColumns.Selectable = True
+   mobjColumns.Alignment = LeftAlign
+   mobjColumns.CaptionAlignment = LeftAlign
+   mobjColumns.DataType = enzColBoolean
+   mobjColumns.InputMask = ""
+   mobjSearch.Add mobjColumns
+   
+   mobjColumns.Caption = "Stock Location"
+   mobjColumns.ColumnWidth = 0
+   mobjColumns.FieldName = "StockLocation"
+   mobjColumns.InSearchCombo = False
+   mobjColumns.Selectable = True
+   mobjColumns.Alignment = LeftAlign
+   mobjColumns.CaptionAlignment = LeftAlign
+   mobjColumns.DataType = enzColText
+   mobjColumns.InputMask = ""
+   mobjSearch.Add mobjColumns
+   
+   mobjColumns.Caption = "Credit Days"
+   mobjColumns.ColumnWidth = 0
+   mobjColumns.FieldName = "CreditDays"
+   mobjColumns.InSearchCombo = False
+   mobjColumns.Selectable = True
+   mobjColumns.Alignment = RightAlign
+   mobjColumns.CaptionAlignment = RightAlign
+   mobjColumns.DataType = enzColInteger
+   mobjColumns.InputMask = ""
+   mobjSearch.Add mobjColumns
+   
+   mobjColumns.Caption = "Credit Limit"
+   mobjColumns.ColumnWidth = 0
+   mobjColumns.FieldName = "CreditLimit"
+   mobjColumns.InSearchCombo = False
+   mobjColumns.Selectable = True
+   mobjColumns.Alignment = RightAlign
+   mobjColumns.CaptionAlignment = RightAlign
+   mobjColumns.DataType = enzColDouble
+   mobjColumns.InputMask = ""
+   mobjSearch.Add mobjColumns
+   
+   mobjColumns.Caption = "Is Include In Incentive - RSO"
+   mobjColumns.ColumnWidth = 0
+   mobjColumns.FieldName = "IsIncludeInIncentiveRSO"
+   mobjColumns.InSearchCombo = False
+   mobjColumns.Selectable = True
+   mobjColumns.Alignment = LeftAlign
+   mobjColumns.CaptionAlignment = LeftAlign
+   mobjColumns.DataType = enzColBoolean
+   mobjColumns.InputMask = ""
+   mobjSearch.Add mobjColumns
+   
+   mobjColumns.Caption = "Total Commission"
+   mobjColumns.ColumnWidth = 0
+   mobjColumns.FieldName = "TotalCommission"
+   mobjColumns.InSearchCombo = False
+   mobjColumns.Selectable = True
+   mobjColumns.Alignment = RightAlign
+   mobjColumns.CaptionAlignment = RightAlign
+   mobjColumns.DataType = enzColDouble
+   mobjColumns.InputMask = ""
+   mobjSearch.Add mobjColumns
+   
+   mobjColumns.Caption = "Income Tax"
+   mobjColumns.ColumnWidth = 0
+   mobjColumns.FieldName = "IncomeTax"
+   mobjColumns.InSearchCombo = False
+   mobjColumns.Selectable = True
+   mobjColumns.Alignment = RightAlign
+   mobjColumns.CaptionAlignment = RightAlign
+   mobjColumns.DataType = enzColDouble
+   mobjColumns.InputMask = ""
+   mobjSearch.Add mobjColumns
+   
+   mobjColumns.Caption = "Income Tax Inc. Value"
+   mobjColumns.ColumnWidth = 0
+   mobjColumns.FieldName = "IncomeTaxIncValue"
+   mobjColumns.InSearchCombo = False
+   mobjColumns.Selectable = True
+   mobjColumns.Alignment = RightAlign
+   mobjColumns.CaptionAlignment = RightAlign
+   mobjColumns.DataType = enzColDouble
+   mobjColumns.InputMask = ""
+   mobjSearch.Add mobjColumns
+   
+   mobjColumns.Caption = "Despatch Date"
+   mobjColumns.ColumnWidth = 0
+   mobjColumns.FieldName = "DespatchDate"
+   mobjColumns.InSearchCombo = False
+   mobjColumns.Selectable = True
+   mobjColumns.Alignment = LeftAlign
+   mobjColumns.CaptionAlignment = LeftAlign
+   mobjColumns.DataType = enzColDate
+   mobjColumns.InputMask = gstrDateInputMask
+   mobjSearch.Add mobjColumns
+   
+   mobjColumns.Caption = "Income Tax %"
+   mobjColumns.ColumnWidth = 0
+   mobjColumns.FieldName = "IncomeTaxPercentage"
+   mobjColumns.InSearchCombo = False
+   mobjColumns.Selectable = True
+   mobjColumns.Alignment = RightAlign
+   mobjColumns.CaptionAlignment = RightAlign
+   mobjColumns.DataType = enzColDouble
+   mobjColumns.InputMask = ""
+   mobjSearch.Add mobjColumns
+   
+   mobjColumns.Caption = "Disc. Category Blu Water"
+   mobjColumns.ColumnWidth = 0
+   mobjColumns.FieldName = "DiscCategory_BluWater"
+   mobjColumns.InSearchCombo = False
+   mobjColumns.Selectable = True
+   mobjColumns.DataType = enzColText
+   mobjColumns.Alignment = LeftAlign
+   mobjColumns.CaptionAlignment = LeftAlign
+   mobjColumns.InputMask = ""
+   mobjSearch.Add mobjColumns
+   
+   mobjColumns.Caption = "Rate Category Blu Water"
+   mobjColumns.ColumnWidth = 0
+   mobjColumns.FieldName = "RateCategory_BluWater"
+   mobjColumns.InSearchCombo = False
+   mobjColumns.Selectable = True
+   mobjColumns.DataType = enzColText
+   mobjColumns.Alignment = LeftAlign
+   mobjColumns.CaptionAlignment = LeftAlign
+   mobjColumns.InputMask = ""
+   mobjSearch.Add mobjColumns
+   
+   mobjColumns.Caption = "Customer Status"
+   mobjColumns.ColumnWidth = 0
+   mobjColumns.FieldName = "CustomerStatus"
+   mobjColumns.InSearchCombo = False
+   mobjColumns.Selectable = True
+   mobjColumns.DataType = enzColText
+   mobjColumns.Alignment = LeftAlign
+   mobjColumns.CaptionAlignment = LeftAlign
+   mobjColumns.InputMask = ""
+   mobjSearch.Add mobjColumns
+   
+   mobjColumns.Caption = "Sales Discounts"
+   mobjColumns.ColumnWidth = 0
+   mobjColumns.FieldName = "SalesDiscounts"
+   mobjColumns.InSearchCombo = False
+   mobjColumns.Selectable = True
+   mobjColumns.Alignment = LeftAlign
+   mobjColumns.CaptionAlignment = LeftAlign
+   mobjColumns.DataType = enzColText
+   mobjColumns.InputMask = ""
+   mobjSearch.Add mobjColumns
+   
+   mobjColumns.Caption = "Cust. Code Sales Promotion"
+   mobjColumns.ColumnWidth = 0
+   mobjColumns.FieldName = "CustCode_SalesProm"
+   mobjColumns.InSearchCombo = False
+   mobjColumns.Selectable = True
+   mobjColumns.Alignment = LeftAlign
+   mobjColumns.CaptionAlignment = LeftAlign
+   mobjColumns.DataType = enzColText
+   mobjColumns.InputMask = gsobstrCustomerIDMask
+   mobjSearch.Add mobjColumns
+   
+   mobjColumns.Caption = "SK ST Percentage"
+   mobjColumns.ColumnWidth = 0
+   mobjColumns.FieldName = "SK_STPercentage"
+   mobjColumns.InSearchCombo = False
+   mobjColumns.Selectable = True
+   mobjColumns.Alignment = RightAlign
+   mobjColumns.CaptionAlignment = RightAlign
+   mobjColumns.DataType = enzColDouble
+   mobjColumns.InputMask = ""
+   mobjSearch.Add mobjColumns
+   
+   mobjColumns.Caption = "Total S.T Value 17%"
+   mobjColumns.ColumnWidth = 0
+   mobjColumns.FieldName = "TotalSTValue_17"
+   mobjColumns.InSearchCombo = False
+   mobjColumns.Selectable = True
+   mobjColumns.Alignment = RightAlign
+   mobjColumns.CaptionAlignment = RightAlign
+   mobjColumns.DataType = enzColDouble
+   mobjColumns.InputMask = ""
+   mobjSearch.Add mobjColumns
+   
+   mobjColumns.Caption = "Total S.T Value 3%"
+   mobjColumns.ColumnWidth = 0
+   mobjColumns.FieldName = "TotalSTValue_03"
+   mobjColumns.InSearchCombo = False
+   mobjColumns.Selectable = True
+   mobjColumns.Alignment = RightAlign
+   mobjColumns.CaptionAlignment = RightAlign
+   mobjColumns.DataType = enzColDouble
+   mobjColumns.InputMask = ""
+   mobjSearch.Add mobjColumns
+   
+   mobjColumns.Caption = "Warehouse"
+   mobjColumns.ColumnWidth = 0
+   mobjColumns.FieldName = "Warehouse"
+   mobjColumns.InSearchCombo = False
+   mobjColumns.Selectable = True
+   mobjColumns.DataType = enzColText
+   mobjColumns.Alignment = LeftAlign
+   mobjColumns.CaptionAlignment = LeftAlign
+   mobjColumns.InputMask = ""
+   mobjSearch.Add mobjColumns
+   
+   mobjColumns.Caption = "Carriage Charges"
+   mobjColumns.ColumnWidth = 0
+   mobjColumns.FieldName = "CarriageCharges"
+   mobjColumns.InSearchCombo = False
+   mobjColumns.Selectable = True
+   mobjColumns.Alignment = RightAlign
+   mobjColumns.CaptionAlignment = RightAlign
+   mobjColumns.DataType = enzColDouble
+   mobjColumns.InputMask = ""
+   mobjSearch.Add mobjColumns
+   
+   mobjColumns.Caption = "Currency"
+   mobjColumns.ColumnWidth = 0
+   mobjColumns.FieldName = "Currency"
+   mobjColumns.InSearchCombo = False
+   mobjColumns.Selectable = True
+   mobjColumns.Alignment = LeftAlign
+   mobjColumns.CaptionAlignment = LeftAlign
+   mobjColumns.DataType = enzColText
+   mobjColumns.InputMask = ""
+   mobjSearch.Add mobjColumns
+   
+   mobjColumns.Caption = "Currency Rate"
+   mobjColumns.ColumnWidth = 0
+   mobjColumns.FieldName = "CurrencyRate"
+   mobjColumns.InSearchCombo = False
+   mobjColumns.Selectable = True
+   mobjColumns.Alignment = LeftAlign
+   mobjColumns.CaptionAlignment = LeftAlign
+   mobjColumns.DataType = enzColDouble
+   mobjColumns.InputMask = ""
+   mobjSearch.Add mobjColumns
+   
+   mobjColumns.Caption = "Total VAT Value"
+   mobjColumns.ColumnWidth = 0
+   mobjColumns.FieldName = "TotalVATValue"
+   mobjColumns.InSearchCombo = False
+   mobjColumns.Selectable = True
+   mobjColumns.Alignment = LeftAlign
+   mobjColumns.CaptionAlignment = LeftAlign
+   mobjColumns.DataType = enzColDouble
+   mobjColumns.InputMask = ""
+   mobjSearch.Add mobjColumns
+   
+   mobjColumns.Caption = "Is Dist. Shop"
+   mobjColumns.ColumnWidth = 0
+   mobjColumns.FieldName = "IsDistShop"
+   mobjColumns.InSearchCombo = False
+   mobjColumns.Selectable = True
+   mobjColumns.Alignment = CenterAlign
+   mobjColumns.CaptionAlignment = CenterAlign
+   mobjColumns.DataType = enzColText
+   mobjColumns.InputMask = ""
+   mobjSearch.Add mobjColumns
+   
+   mobjColumns.Caption = "DIST. SHOP"
+   mobjColumns.ColumnWidth = 0
+   mobjColumns.FieldName = "DistShop"
+   mobjColumns.InSearchCombo = False
+   mobjColumns.Selectable = True
+   mobjColumns.Alignment = CenterAlign
+   mobjColumns.CaptionAlignment = CenterAlign
+   mobjColumns.DataType = enzColText
+   mobjColumns.InputMask = ""
+   mobjSearch.Add mobjColumns
+   
+   Set objfrmSearch.Search = mobjSearch
+   objfrmSearch.QueryString = TempStr
+   Set objfrmSearch.ParentForm = Me
+   objfrmSearch.IsDisconnected = False
+   objfrmSearch.RememberLastView = True
+   objfrmSearch.DefaultSearchField = 1
+
+   If mUserPriv.CanAuthorize = True Then
+      objfrmSearch.SortOn = "Authorized;Checked"
+      objfrmSearch.SortOptions = "UnPosted-0;Posted-1,UnChecked-0;Checked-1"
+
+   ElseIf mUserPriv.CanCheck = True Then
+      objfrmSearch.SortOn = "Checked;Authorized"
+      objfrmSearch.SortOptions = "UnChecked-0;Checked-1,Posted-1;UnPosted-0"
+
+   Else
+      objfrmSearch.SortOn = "Checked;Authorized"
+      objfrmSearch.SortOptions = "UnChecked-0;Checked-1,Posted-1;UnPosted-0"
+
+   End If
+
+   objfrmSearch.Caption = objfrmSearch.Caption & " - " & mstrFrmCaption
+   mscSearchCaller = scFind
+   objfrmSearch.Show
+
+   Set mobjSearch = Nothing
+End Sub
+
+Private Sub enztb_ClickExit()
+   Unload Me
+   
+   Call DisplayDocStatus(False, True)
+End Sub
+
+Private Sub Form_QueryUnload(Cancel As Integer, UnloadMode As Integer)
+   If mvarFormMode = enzViewMode Then
+      Call UnloadSearchForm(Me)
+
+      AppCnn.Execute ("if exists (select * from dbo.sysobjects where id = object_id(N'" & _
+                      "[dbo].[vwCustomerBalances" & GetUserID & "]') and OBJECTPROPERTY(id, N'IsView') = 1) " & _
+                      "drop view [dbo].[vwCustomerBalances" & GetUserID & "]")
+
+   Else
+      Cancel = 1
+
+   End If
+End Sub
+
+Private Sub fpgTransaction_Advance(ByVal AdvanceNext As Boolean)
+   Dim varStr As Variant
+
+   If fpgTransaction.ActiveRow = fpgTransaction.MaxRows Then
+
+      With fpgTransaction
+      
+         .GetText 1, .ActiveRow, varStr
+         If Len(varStr) <= 0 Then Exit Sub
+
+         .GetText 4, .ActiveRow, varStr
+         If Val(varStr) <= 0 Then Exit Sub
+         
+         .GetText 7, .ActiveRow, varStr
+         If Val(varStr) <= 0 Then Exit Sub
+
+         .MaxRows = .MaxRows + 1
+         .SetActiveCell 1, fpgTransaction.MaxRows
+         
+         .Col = -1
+         .Row = -1
+         .BackColor = RGB(255, 255, 255)
+         .SetCellBorder -1, -1, -1, -1, SS_BORDER_TYPE_NONE, RGB(255, 0, 0), CellBorderStyleSolid
+      
+         .Col = -1
+         .Row = .ActiveRow
+         .BackColor = RGB(192, 192, 192)
+         .SetCellBorder -1, .ActiveRow, -1, .ActiveRow, SS_BORDER_TYPE_OUTLINE, RGB(255, 0, 0), CellBorderStyleSolid
+         
+      End With
+
+   End If
+End Sub
+
+Private Sub fpgTransaction_BlockSelected(ByVal BlockCol As Long, ByVal BlockRow As Long, ByVal BlockCol2 As Long, ByVal BlockRow2 As Long)
+   With fpgTransaction
+      .Row = BlockRow
+      .Row2 = BlockRow2
+   End With
+End Sub
+
+Private Sub fpgTransaction_EditChange(ByVal Col As Long, ByVal Row As Long)
+   Dim varFGCode  As Variant
+   
+   Dim rsFG       As New ADODB.Recordset
+   
+   Dim varSTPer   As Variant
+   Dim varSEDPer  As Variant
+   
+   Dim mrsRatesInformation As New ADODB.Recordset
+   
+   If fpgTransaction.ActiveCol = 1 Then
+   
+      fpgTransaction.GetText 1, fpgTransaction.ActiveRow, varFGCode
+      
+      If Len(varFGCode) = Len(gsobstrFGIDMask) Then
+         If IsKeyValueExistsInGrid(fpgTransaction, varFGCode, 1, _
+            "Finished Goods Code has already been entered.") = False Then
+            
+            fpgTransaction.SetText 2, fpgTransaction.ActiveRow, ""
+            fpgTransaction.SetText 3, fpgTransaction.ActiveRow, ""
+            fpgTransaction.SetText 4, fpgTransaction.ActiveRow, ""
+            fpgTransaction.SetText 5, fpgTransaction.ActiveRow, ""
+            fpgTransaction.SetText 6, fpgTransaction.ActiveRow, ""
+            fpgTransaction.SetText 7, fpgTransaction.ActiveRow, ""
+            fpgTransaction.SetText 8, fpgTransaction.ActiveRow, ""
+            fpgTransaction.SetText 9, fpgTransaction.ActiveRow, ""
+            fpgTransaction.SetText 10, fpgTransaction.ActiveRow, ""
+            fpgTransaction.SetText 11, fpgTransaction.ActiveRow, ""
+            fpgTransaction.SetText 12, fpgTransaction.ActiveRow, ""
+            fpgTransaction.SetText 13, fpgTransaction.ActiveRow, ""
+            fpgTransaction.SetText 14, fpgTransaction.ActiveRow, ""
+            fpgTransaction.SetText 15, fpgTransaction.ActiveRow, ""
+            fpgTransaction.SetText 16, fpgTransaction.ActiveRow, ""
+            fpgTransaction.SetText 17, fpgTransaction.ActiveRow, ""
+            fpgTransaction.SetText 18, fpgTransaction.ActiveRow, ""
+            fpgTransaction.SetText 19, fpgTransaction.ActiveRow, ""
+            fpgTransaction.SetText 20, fpgTransaction.ActiveRow, ""
+            fpgTransaction.SetText 21, fpgTransaction.ActiveRow, ""
+            fpgTransaction.SetText 22, fpgTransaction.ActiveRow, ""
+            fpgTransaction.SetText 23, fpgTransaction.ActiveRow, ""
+            fpgTransaction.SetText 24, fpgTransaction.ActiveRow, ""
+            fpgTransaction.SetText 25, fpgTransaction.ActiveRow, ""
+            fpgTransaction.SetText 26, fpgTransaction.ActiveRow, ""
+            fpgTransaction.SetText 27, fpgTransaction.ActiveRow, ""
+            fpgTransaction.SetText 28, fpgTransaction.ActiveRow, ""
+            fpgTransaction.SetText 29, fpgTransaction.ActiveRow, ""
+            fpgTransaction.SetText 30, fpgTransaction.ActiveRow, ""
+            fpgTransaction.SetText 31, fpgTransaction.ActiveRow, ""
+            fpgTransaction.SetText 34, fpgTransaction.ActiveRow, ""
+            
+            fpgTransaction.SetActiveCell 1, fpgTransaction.ActiveRow
+            fpgTransaction.SetFocus
+            
+            Call GridRowCalculations(fpgTransaction.ActiveRow)
+            Call CalculateTotals
+            
+            Exit Sub
+         End If
+      End If
+      
+      rsFG.Open "SELECT Brand_Title, FGName, UOM_Title, STPercentage, NoOfUnitsInPack, UnitWeight, ForTonsConversion, EmptyCartonPercentage, " & _
+                "DistributorMargin, RetailerMargin, SEDPercentage, tblInvItemFG.SG_ID FROM tblInvItemFG INNER JOIN tblInvItemFGBrand Brand ON " & _
+                "tblInvItemFG.Brand_ID = Brand.Brand_ID INNER JOIN tblInvItemFGGroup FGGroup ON tblInvItemFG.FGGroup_ID = FGGroup.FGGroup_ID " & _
+                "INNER JOIN tblInvItemFGPackingType PT ON tblInvItemFG.PT_ID = PT.PT_ID INNER JOIN tblInvItemFGSaleGroup SG ON tblInvItemFG.SG_ID = " & _
+                "SG.SG_ID INNER JOIN tblInvItemFGUOM UOM ON tblInvItemFG.UOM_ID = UOM.UOM_ID WHERE CompanyID = " & Val(gstrOrgID) & " AND " & _
+                "Inactive = '0' AND FG_ID = " & Val(varFGCode) & " AND SI_CM_Type = 'BG' ORDER BY FG_ID", AppCnn, adOpenStatic, adLockReadOnly
+      
+      varSTPer = 0#
+      
+      If rsFG.RecordCount > 0 Then
+         rsFG.MoveFirst
+         
+         fpgTransaction.SetText 2, fpgTransaction.ActiveRow, rsFG.Fields("Brand_Title").Value
+         fpgTransaction.SetText 3, fpgTransaction.ActiveRow, rsFG.Fields("FGName").Value
+         fpgTransaction.SetText 6, fpgTransaction.ActiveRow, rsFG.Fields("UOM_Title").Value
+         
+         varSTPer = rsFG.Fields("STPercentage").Value
+            
+         fpgTransaction.SetText 11, fpgTransaction.ActiveRow, 0#
+         
+         fpgTransaction.SetText 16, fpgTransaction.ActiveRow, rsFG.Fields("NoOfUnitsInPack").Value
+         fpgTransaction.SetText 17, fpgTransaction.ActiveRow, rsFG.Fields("UnitWeight").Value
+         fpgTransaction.SetText 18, fpgTransaction.ActiveRow, rsFG.Fields("ForTonsConversion").Value
+         fpgTransaction.SetText 19, fpgTransaction.ActiveRow, rsFG.Fields("EmptyCartonPercentage").Value
+         fpgTransaction.SetText 22, fpgTransaction.ActiveRow, rsFG.Fields("DistributorMargin").Value
+         fpgTransaction.SetText 23, fpgTransaction.ActiveRow, rsFG.Fields("RetailerMargin").Value
+         
+         varSEDPer = rsFG.Fields("STPercentage").Value
+         
+         fpgTransaction.SetText 25, fpgTransaction.ActiveRow, varSEDPer
+         
+         fpgTransaction.SetText 31, fpgTransaction.ActiveRow, rsFG.Fields("SG_ID").Value
+         
+      Else
+         fpgTransaction.SetText 2, fpgTransaction.ActiveRow, ""
+         fpgTransaction.SetText 3, fpgTransaction.ActiveRow, ""
+         fpgTransaction.SetText 6, fpgTransaction.ActiveRow, ""
+         fpgTransaction.SetText 11, fpgTransaction.ActiveRow, ""
+         fpgTransaction.SetText 16, fpgTransaction.ActiveRow, ""
+         fpgTransaction.SetText 17, fpgTransaction.ActiveRow, ""
+         fpgTransaction.SetText 18, fpgTransaction.ActiveRow, ""
+         fpgTransaction.SetText 19, fpgTransaction.ActiveRow, ""
+         fpgTransaction.SetText 22, fpgTransaction.ActiveRow, ""
+         fpgTransaction.SetText 23, fpgTransaction.ActiveRow, ""
+         fpgTransaction.SetText 25, fpgTransaction.ActiveRow, ""
+         fpgTransaction.SetText 31, fpgTransaction.ActiveRow, ""
+         fpgTransaction.SetText 34, fpgTransaction.ActiveRow, ""
+         
+      End If
+         
+      With mrsRatesInformation
+         .ActiveConnection = AppCnn
+         .CursorLocation = adUseClient
+         .LockType = adLockReadOnly
+         .CursorType = adOpenStatic
+         .Source = "SELECT * FROM tblSalDiscCategoryWiseRates Rates INNER JOIN tblSalDiscCategoryWiseRatesDetail " & _
+                   "RatesDtl ON Rates.CompanyID = RatesDtl.CompanyID AND Rates.DiscountCategory = " & _
+                   "RatesDtl.DiscountCategory AND Rates.EffectiveDate = RatesDtl.EffectiveDate WHERE " & _
+                   "RatesDtl.CompanyID = " & Val(gstrOrgID) & " AND FG_ID = " & Val(varFGCode) & " AND " & _
+                   "RatesDtl.DiscountCategory = 'NORMAL' AND " & _
+                   "RatesDtl.EffectiveDate <= '" & Format(mebSalesEntryDate.text, gstrdbDateFormat) & "' AND " & _
+                   "Authorized = '1' AND BasicRate > 0 ORDER BY RatesDtl.EffectiveDate"
+         .Open
+      End With
+      
+      If mrsRatesInformation.RecordCount > 0 Then
+         mrsRatesInformation.MoveLast
+         
+         fpgTransaction.SetText 7, fpgTransaction.ActiveRow, mrsRatesInformation.Fields("BasicRate").Value
+         
+         fpgTransaction.SetText 8, fpgTransaction.ActiveRow, mrsRatesInformation.Fields("SpecialDiscount").Value
+         
+         fpgTransaction.SetText 20, fpgTransaction.ActiveRow, mrsRatesInformation.Fields("FreightChargesPerBasicUnit").Value
+         fpgTransaction.SetText 21, fpgTransaction.ActiveRow, mrsRatesInformation.Fields("SoapChargesPerCarton").Value
+         fpgTransaction.SetText 24, fpgTransaction.ActiveRow, mrsRatesInformation.Fields("LeakageRate").Value
+         
+      Else
+         fpgTransaction.SetText 7, fpgTransaction.ActiveRow, ""
+         fpgTransaction.SetText 8, fpgTransaction.ActiveRow, ""
+         fpgTransaction.SetText 20, fpgTransaction.ActiveRow, ""
+         fpgTransaction.SetText 21, fpgTransaction.ActiveRow, ""
+         fpgTransaction.SetText 24, fpgTransaction.ActiveRow, ""
+         
+      End If
+      
+      mrsRatesInformation.Close
+      Set mrsRatesInformation = Nothing
+      
+      '''Call GridRowCalculations(fpgTransaction.ActiveRow, Val(varSTPer), Val(varSEDPer))
+      Call GridRowCalculations(fpgTransaction.ActiveRow, 0, Val(varSEDPer))
+      
+   ElseIf fpgTransaction.ActiveCol = 4 Or fpgTransaction.ActiveCol = 7 Or fpgTransaction.ActiveCol = 8 Or _
+          fpgTransaction.ActiveCol = 25 Or fpgTransaction.ActiveCol = 27 Or fpgTransaction.ActiveCol = 29 Then
+                                                                        
+'''      If Left(cboSalesEntryType.text, 2) = "SK" Or Left(cboSalesEntryType.text, 2) = "OT" Or Left(cboSalesEntryType.text, 2) = "SG" Then
+'''         fpgTransaction.GetText 11, fpgTransaction.ActiveRow, varSTPer
+'''
+'''         Call GridRowCalculations(fpgTransaction.ActiveRow, Val(varSTPer), Val(varSEDPer))
+'''
+'''      Else
+         Call GridRowCalculations(fpgTransaction.ActiveRow)
+'''
+'''      End If
+                                                                        
+   End If
+   
+   Call CalculateTotals
+End Sub
+
+Private Sub fpgTransaction_KeyUp(KeyCode As Integer, Shift As Integer)
+   Dim varStr        As Variant
+   
+   Dim i             As Long
+   
+   Dim TempStr       As String
+   
+   Dim mobjSearch    As New enzCSearch
+   Dim objfrmSearch  As New frmSftSearch
+   Dim mobjColumns   As New enzCSearchColumn
+   
+   If mvarFormMode = enzAddMode Or mvarFormMode = enzEditMode Then
+   
+      If KeyCode = vbKeyF2 Then
+         fpgTransaction.EditMode = True
+         Exit Sub
+      End If
+   
+      If KeyCode = vbKeyDelete Then
+         
+         If fpgTransaction.IsBlockSelected = True Then
+            
+            i = fpgTransaction.Row2 - fpgTransaction.Row + 1
+            fpgTransaction.DeleteRows fpgTransaction.Row, i
+            fpgTransaction.MaxRows = fpgTransaction.MaxRows - i
+
+            If fpgTransaction.MaxRows = 0 Then
+               fpgTransaction.MaxRows = 1
+            End If
+            
+         Else
+
+            If fpgTransaction.EditMode = True Then
+               Exit Sub
+               
+            Else
+               If fpgTransaction.ActiveCol = 1 Then
+                  fpgTransaction.SetText fpgTransaction.ActiveCol, fpgTransaction.ActiveRow, ""
+                  fpgTransaction.SetText 2, fpgTransaction.ActiveRow, ""
+                  fpgTransaction.SetText 3, fpgTransaction.ActiveRow, ""
+                  fpgTransaction.SetText 4, fpgTransaction.ActiveRow, ""
+                  fpgTransaction.SetText 5, fpgTransaction.ActiveRow, ""
+                  fpgTransaction.SetText 6, fpgTransaction.ActiveRow, ""
+                  fpgTransaction.SetText 7, fpgTransaction.ActiveRow, ""
+                  fpgTransaction.SetText 8, fpgTransaction.ActiveRow, ""
+                  fpgTransaction.SetText 9, fpgTransaction.ActiveRow, ""
+                  fpgTransaction.SetText 10, fpgTransaction.ActiveRow, ""
+                  fpgTransaction.SetText 11, fpgTransaction.ActiveRow, ""
+                  fpgTransaction.SetText 12, fpgTransaction.ActiveRow, ""
+                  fpgTransaction.SetText 13, fpgTransaction.ActiveRow, ""
+                  fpgTransaction.SetText 14, fpgTransaction.ActiveRow, ""
+                  fpgTransaction.SetText 15, fpgTransaction.ActiveRow, ""
+                  fpgTransaction.SetText 16, fpgTransaction.ActiveRow, ""
+                  fpgTransaction.SetText 17, fpgTransaction.ActiveRow, ""
+                  fpgTransaction.SetText 18, fpgTransaction.ActiveRow, ""
+                  fpgTransaction.SetText 19, fpgTransaction.ActiveRow, ""
+                  fpgTransaction.SetText 20, fpgTransaction.ActiveRow, ""
+                  fpgTransaction.SetText 21, fpgTransaction.ActiveRow, ""
+                  fpgTransaction.SetText 22, fpgTransaction.ActiveRow, ""
+                  fpgTransaction.SetText 23, fpgTransaction.ActiveRow, ""
+                  fpgTransaction.SetText 24, fpgTransaction.ActiveRow, ""
+                  fpgTransaction.SetText 25, fpgTransaction.ActiveRow, ""
+                  fpgTransaction.SetText 26, fpgTransaction.ActiveRow, ""
+                  fpgTransaction.SetText 27, fpgTransaction.ActiveRow, ""
+                  fpgTransaction.SetText 28, fpgTransaction.ActiveRow, ""
+                  fpgTransaction.SetText 29, fpgTransaction.ActiveRow, ""
+                  fpgTransaction.SetText 30, fpgTransaction.ActiveRow, ""
+                  fpgTransaction.SetText 31, fpgTransaction.ActiveRow, ""
+                  fpgTransaction.SetText 34, fpgTransaction.ActiveRow, ""
+               End If
+               
+            End If
+            
+         End If
+         
+         Call CalculateTotals
+                  
+      End If
+      
+      If fpgTransaction.ActiveCol = 1 And KeyCode = vbKeyF4 Then
+      
+         TempStr = "SELECT FG_ID, Brand_Title, FGName, UOM_Title, NoOfUnitsInPack, UnitWeight, ForTonsConversion, STPercentage, " & _
+                   "EmptyCartonPercentage, DistributorMargin, RetailerMargin, SEDPercentage, tblInvItemFG.SG_ID FROM tblInvItemFG INNER JOIN " & _
+                   "tblInvItemFGBrand Brand ON tblInvItemFG.Brand_ID = Brand.Brand_ID INNER JOIN tblInvItemFGGroup FGGroup ON " & _
+                   "tblInvItemFG.FGGroup_ID = FGGroup.FGGroup_ID INNER JOIN tblInvItemFGPackingType PT ON tblInvItemFG.PT_ID = PT.PT_ID " & _
+                   "INNER JOIN tblInvItemFGSaleGroup SG ON tblInvItemFG.SG_ID = SG.SG_ID INNER JOIN tblInvItemFGUOM UOM ON tblInvItemFG.UOM_ID = " & _
+                   "UOM.UOM_ID WHERE CompanyID = " & Val(gstrOrgID) & " AND Inactive = '0' AND " & _
+                   "SI_CM_Type = 'BG' ORDER BY FG_ID"
+         
+         mobjColumns.Caption = "FG Code"
+         mobjColumns.ColumnWidth = 2100
+         mobjColumns.FieldName = "FG_ID"
+         mobjColumns.InSearchCombo = True
+         mobjColumns.Selectable = True
+         mobjColumns.Alignment = LeftAlign
+         mobjColumns.CaptionAlignment = LeftAlign
+         mobjColumns.DataType = enzColInteger
+         mobjColumns.InputMask = gsobstrFGIDMask
+         mobjSearch.Add mobjColumns
+   
+         mobjColumns.Caption = "Brand Name"
+         mobjColumns.ColumnWidth = 3500
+         mobjColumns.FieldName = "Brand_Title"
+         mobjColumns.InSearchCombo = True
+         mobjColumns.Selectable = True
+         mobjColumns.Alignment = LeftAlign
+         mobjColumns.CaptionAlignment = LeftAlign
+         mobjColumns.DataType = enzColText
+         mobjColumns.InputMask = ""
+         mobjSearch.Add mobjColumns
+         
+         mobjColumns.Caption = "FG Name"
+         mobjColumns.ColumnWidth = 5000
+         mobjColumns.FieldName = "FGName"
+         mobjColumns.InSearchCombo = True
+         mobjColumns.Selectable = True
+         mobjColumns.Alignment = LeftAlign
+         mobjColumns.CaptionAlignment = LeftAlign
+         mobjColumns.DataType = enzColText
+         mobjColumns.InputMask = ""
+         mobjSearch.Add mobjColumns
+         
+         mobjColumns.Caption = "UOM Title"
+         mobjColumns.ColumnWidth = 0
+         mobjColumns.FieldName = "UOM_Title"
+         mobjColumns.InSearchCombo = False
+         mobjColumns.Selectable = True
+         mobjColumns.Alignment = LeftAlign
+         mobjColumns.CaptionAlignment = LeftAlign
+         mobjColumns.DataType = enzColText
+         mobjColumns.InputMask = ""
+         mobjSearch.Add mobjColumns
+         
+         mobjColumns.Caption = "No. of Units in Pack"
+         mobjColumns.ColumnWidth = 0
+         mobjColumns.FieldName = "NoOfUnitsInPack"
+         mobjColumns.InSearchCombo = False
+         mobjColumns.Selectable = True
+         mobjColumns.Alignment = LeftAlign
+         mobjColumns.CaptionAlignment = LeftAlign
+         mobjColumns.DataType = enzColInteger
+         mobjColumns.InputMask = ""
+         mobjSearch.Add mobjColumns
+         
+         mobjColumns.Caption = "Unit Weight"
+         mobjColumns.ColumnWidth = 0
+         mobjColumns.FieldName = "UnitWeight"
+         mobjColumns.InSearchCombo = False
+         mobjColumns.Selectable = True
+         mobjColumns.Alignment = LeftAlign
+         mobjColumns.CaptionAlignment = LeftAlign
+         mobjColumns.DataType = enzColDouble
+         mobjColumns.InputMask = ""
+         mobjSearch.Add mobjColumns
+         
+         mobjColumns.Caption = "For Tons Conversion"
+         mobjColumns.ColumnWidth = 0
+         mobjColumns.FieldName = "ForTonsConversion"
+         mobjColumns.InSearchCombo = False
+         mobjColumns.Selectable = True
+         mobjColumns.Alignment = LeftAlign
+         mobjColumns.CaptionAlignment = LeftAlign
+         mobjColumns.DataType = enzColText
+         mobjColumns.InputMask = ""
+         mobjSearch.Add mobjColumns
+         
+         mobjColumns.Caption = "S.T Percentage"
+         mobjColumns.ColumnWidth = 0
+         mobjColumns.FieldName = "STPercentage"
+         mobjColumns.InSearchCombo = False
+         mobjColumns.Selectable = True
+         mobjColumns.Alignment = LeftAlign
+         mobjColumns.CaptionAlignment = LeftAlign
+         mobjColumns.DataType = enzColDouble
+         mobjColumns.InputMask = ""
+         mobjSearch.Add mobjColumns
+         
+         mobjColumns.Caption = "Empty Carton Percentage"
+         mobjColumns.ColumnWidth = 0
+         mobjColumns.FieldName = "EmptyCartonPercentage"
+         mobjColumns.InSearchCombo = False
+         mobjColumns.Selectable = True
+         mobjColumns.Alignment = LeftAlign
+         mobjColumns.CaptionAlignment = LeftAlign
+         mobjColumns.DataType = enzColDouble
+         mobjColumns.InputMask = ""
+         mobjSearch.Add mobjColumns
+         
+         mobjColumns.Caption = "Dist. Margin"
+         mobjColumns.ColumnWidth = 0
+         mobjColumns.FieldName = "DistributorMargin"
+         mobjColumns.InSearchCombo = False
+         mobjColumns.Selectable = True
+         mobjColumns.Alignment = LeftAlign
+         mobjColumns.CaptionAlignment = LeftAlign
+         mobjColumns.DataType = enzColDouble
+         mobjColumns.InputMask = ""
+         mobjSearch.Add mobjColumns
+         
+         mobjColumns.Caption = "Retailer Margin"
+         mobjColumns.ColumnWidth = 0
+         mobjColumns.FieldName = "RetailerMargin"
+         mobjColumns.InSearchCombo = False
+         mobjColumns.Selectable = True
+         mobjColumns.Alignment = LeftAlign
+         mobjColumns.CaptionAlignment = LeftAlign
+         mobjColumns.DataType = enzColDouble
+         mobjColumns.InputMask = ""
+         mobjSearch.Add mobjColumns
+         
+         mobjColumns.Caption = "S.E.D Percentage"
+         mobjColumns.ColumnWidth = 0
+         mobjColumns.FieldName = "SEDPercentage"
+         mobjColumns.InSearchCombo = False
+         mobjColumns.Selectable = True
+         mobjColumns.Alignment = LeftAlign
+         mobjColumns.CaptionAlignment = LeftAlign
+         mobjColumns.DataType = enzColDouble
+         mobjColumns.InputMask = ""
+         mobjSearch.Add mobjColumns
+         
+         mobjColumns.Caption = "SG ID"
+         mobjColumns.ColumnWidth = 0
+         mobjColumns.FieldName = "SG_ID"
+         mobjColumns.InSearchCombo = False
+         mobjColumns.Selectable = True
+         mobjColumns.Alignment = LeftAlign
+         mobjColumns.CaptionAlignment = LeftAlign
+         mobjColumns.DataType = enzColInteger
+         mobjColumns.InputMask = ""
+         mobjSearch.Add mobjColumns
+         
+         Set objfrmSearch.Search = mobjSearch
+         objfrmSearch.QueryString = TempStr
+         objfrmSearch.DefaultSearchField = 2
+         objfrmSearch.IsDisconnected = False
+         objfrmSearch.RememberLastView = True
+         Set objfrmSearch.ParentForm = Me
+         objfrmSearch.Caption = objfrmSearch.Caption & " - Finished Goods Information"
+         mscSearchCaller = scFGCode
+         objfrmSearch.Show
+         
+         Set mobjSearch = Nothing
+      
+      End If
+      
+   ElseIf mvarFormMode = enzViewMode Then
+   
+      If fpgTransaction.ActiveCol = 7 And KeyCode = vbKeyF4 Then
+      
+         Dim tmpFGCode  As Variant
+         
+         Dim objUPriv   As enzCPrivilege
+         
+         'APPLY USER RIGHTS FOR RATE CHANGE.
+         Set objUPriv = GetAccessRights("optSalBillRateChange")
+         If objUPriv.CanAuthorize = False Then
+            MsgBox "Access denied for FG Rate Information.", vbExclamation + vbOKOnly, App.ProductName
+            Exit Sub
+         End If
+      
+         fpgTransaction.GetText 1, fpgTransaction.ActiveRow, tmpFGCode
+         
+         If Len(tmpFGCode) = 0 Then
+            MsgBox "FG Code must be selected.", vbExclamation + vbOKOnly, App.ProductName
+            fpgTransaction.SetActiveCell 1, fpgTransaction.ActiveRow
+            fpgTransaction.SetFocus
+            Exit Sub
+         End If
+         
+         TempStr = "SELECT RatesDtl.EffectiveDate, BasicRate, FreightChargesPerBasicUnit, SoapChargesPerCarton, " & _
+                   "SpecialDiscount, LeakageRate FROM tblSalDiscCategoryWiseRates Rates INNER JOIN " & _
+                   "tblSalDiscCategoryWiseRatesDetail RatesDtl ON Rates.CompanyID = RatesDtl.CompanyID AND " & _
+                   "Rates.DiscountCategory = RatesDtl.DiscountCategory AND Rates.EffectiveDate = " & _
+                   "RatesDtl.EffectiveDate WHERE RatesDtl.CompanyID = " & Val(gstrOrgID) & " AND " & _
+                   "FG_ID = " & Val(tmpFGCode) & " AND RatesDtl.DiscountCategory = 'NORMAL' AND " & _
+                   "RatesDtl.EffectiveDate <= '" & Format(mebSalesEntryDate.text, gstrdbDateFormat) & "' AND " & _
+                   "Authorized = '1' AND BasicRate > 0 ORDER BY RatesDtl.EffectiveDate DESC"
+                   
+         mobjColumns.Caption = "Effective Date"
+         mobjColumns.ColumnWidth = 1500
+         mobjColumns.FieldName = "EffectiveDate"
+         mobjColumns.InSearchCombo = True
+         mobjColumns.Selectable = True
+         mobjColumns.Alignment = LeftAlign
+         mobjColumns.CaptionAlignment = LeftAlign
+         mobjColumns.DataType = enzColDate
+         mobjColumns.InputMask = gstrDateInputMask
+         mobjSearch.Add mobjColumns
+            
+         mobjColumns.Caption = "Basic Rate"
+         mobjColumns.ColumnWidth = 1500
+         mobjColumns.FieldName = "BasicRate"
+         mobjColumns.InSearchCombo = False
+         mobjColumns.Selectable = True
+         mobjColumns.Alignment = LeftAlign
+         mobjColumns.CaptionAlignment = LeftAlign
+         mobjColumns.DataType = enzColDouble
+         mobjColumns.InputMask = ""
+         mobjSearch.Add mobjColumns
+         
+         mobjColumns.Caption = "Freight Charges Per Basic Unit"
+         mobjColumns.ColumnWidth = 0
+         mobjColumns.FieldName = "FreightChargesPerBasicUnit"
+         mobjColumns.InSearchCombo = False
+         mobjColumns.Selectable = True
+         mobjColumns.Alignment = LeftAlign
+         mobjColumns.CaptionAlignment = LeftAlign
+         mobjColumns.DataType = enzColDouble
+         mobjColumns.InputMask = ""
+         mobjSearch.Add mobjColumns
+         
+         mobjColumns.Caption = "Soap Charges Per Carton"
+         mobjColumns.ColumnWidth = 0
+         mobjColumns.FieldName = "SoapChargesPerCarton"
+         mobjColumns.InSearchCombo = False
+         mobjColumns.Selectable = True
+         mobjColumns.Alignment = LeftAlign
+         mobjColumns.CaptionAlignment = LeftAlign
+         mobjColumns.DataType = enzColDouble
+         mobjColumns.InputMask = ""
+         mobjSearch.Add mobjColumns
+         
+         mobjColumns.Caption = "Special Discount"
+         mobjColumns.ColumnWidth = 0
+         mobjColumns.FieldName = "SpecialDiscount"
+         mobjColumns.InSearchCombo = False
+         mobjColumns.Selectable = True
+         mobjColumns.Alignment = LeftAlign
+         mobjColumns.CaptionAlignment = LeftAlign
+         mobjColumns.DataType = enzColDouble
+         mobjColumns.InputMask = ""
+         mobjSearch.Add mobjColumns
+         
+         mobjColumns.Caption = "Leakage Rate"
+         mobjColumns.ColumnWidth = 0
+         mobjColumns.FieldName = "LeakageRate"
+         mobjColumns.InSearchCombo = False
+         mobjColumns.Selectable = True
+         mobjColumns.Alignment = LeftAlign
+         mobjColumns.CaptionAlignment = LeftAlign
+         mobjColumns.DataType = enzColDouble
+         mobjColumns.InputMask = ""
+         mobjSearch.Add mobjColumns
+         
+         Set objfrmSearch.Search = mobjSearch
+         objfrmSearch.QueryString = TempStr
+         objfrmSearch.DefaultSearchField = 0
+         objfrmSearch.IsDisconnected = False
+         Set objfrmSearch.ParentForm = Me
+         objfrmSearch.Caption = objfrmSearch.Caption & " - FG Rate Information"
+         mscSearchCaller = scRateInformation
+         objfrmSearch.Show
+         
+         Set mobjSearch = Nothing
+         
+      End If
+   
+   End If
+End Sub
+
+Private Sub fpgTransaction_LeaveCell(ByVal Col As Long, ByVal Row As Long, ByVal NewCol As Long, ByVal NewRow As Long, _
+                                     Cancel As Boolean)
+                                     
+   fpgTransaction.Col = -1
+   fpgTransaction.Row = -1
+   fpgTransaction.BackColor = RGB(255, 255, 255)
+   fpgTransaction.SetCellBorder -1, -1, -1, -1, SS_BORDER_TYPE_NONE, RGB(255, 0, 0), CellBorderStyleSolid
+
+   fpgTransaction.Col = -1
+   fpgTransaction.Row = NewRow
+   fpgTransaction.BackColor = RGB(192, 192, 192)
+   fpgTransaction.SetCellBorder -1, NewRow, -1, NewRow, SS_BORDER_TYPE_OUTLINE, RGB(255, 0, 0), CellBorderStyleSolid
+End Sub
+
+Private Sub mebCustomerCode_GotFocus()
+   Call SelectText(mebCustomerCode)
+End Sub
+
+Private Sub mebCustomerCode_KeyUp(KeyCode As Integer, Shift As Integer)
+   If KeyCode = vbKeyF4 And TypeOf Me.ActiveControl Is MaskEdBox Then
+
+      Dim TempStr       As String
+      
+      Dim mobjColumns   As New enzCSearchColumn
+      Dim mobjSearch    As New enzCSearch
+      Dim objfrmSearch  As New frmSftSearch
+      
+      TempStr = "SELECT CustomerID, CustomerCoName, DiscCategory, Address, CreditLimit, IsTaxesApplied, IntegDefAccID, " & _
+                "DiscCategory_BluWater, RateCategory_BluWater, IncomeTaxPercentage, CustomerStatus, IsDistShop FROM tblSalCustomerInfo " & _
+                "WHERE CompanyID = " & Val(gstrOrgID) & " AND Inactive = '0' ORDER BY CustomerCoName"
+                
+      mobjColumns.Caption = "Customer Code"
+      mobjColumns.ColumnWidth = 1800
+      mobjColumns.FieldName = "CustomerID"
+      mobjColumns.InSearchCombo = True
+      mobjColumns.Selectable = True
+      mobjColumns.Alignment = LeftAlign
+      mobjColumns.CaptionAlignment = LeftAlign
+      mobjColumns.DataType = enzColText
+      mobjColumns.InputMask = gsobstrCustomerIDMask
+      mobjSearch.Add mobjColumns
+   
+      mobjColumns.Caption = "Customer Name"
+      mobjColumns.ColumnWidth = 5000
+      mobjColumns.FieldName = "CustomerCoName"
+      mobjColumns.InSearchCombo = True
+      mobjColumns.Selectable = True
+      mobjColumns.Alignment = LeftAlign
+      mobjColumns.CaptionAlignment = LeftAlign
+      mobjColumns.DataType = enzColText
+      mobjColumns.InputMask = ""
+      mobjSearch.Add mobjColumns
+      
+      mobjColumns.Caption = "Disc. Category"
+      mobjColumns.ColumnWidth = 0
+      mobjColumns.FieldName = "DiscCategory"
+      mobjColumns.InSearchCombo = False
+      mobjColumns.Selectable = True
+      mobjColumns.Alignment = LeftAlign
+      mobjColumns.CaptionAlignment = LeftAlign
+      mobjColumns.DataType = enzColText
+      mobjColumns.InputMask = ""
+      mobjSearch.Add mobjColumns
+      
+      mobjColumns.Caption = "Address"
+      mobjColumns.ColumnWidth = 4000
+      mobjColumns.FieldName = "Address"
+      mobjColumns.InSearchCombo = False
+      mobjColumns.Selectable = True
+      mobjColumns.Alignment = LeftAlign
+      mobjColumns.CaptionAlignment = LeftAlign
+      mobjColumns.DataType = enzColText
+      mobjColumns.InputMask = ""
+      mobjSearch.Add mobjColumns
+      
+      mobjColumns.Caption = "Credit Limit"
+      mobjColumns.ColumnWidth = 0
+      mobjColumns.FieldName = "CreditLimit"
+      mobjColumns.InSearchCombo = False
+      mobjColumns.Selectable = True
+      mobjColumns.Alignment = LeftAlign
+      mobjColumns.CaptionAlignment = LeftAlign
+      mobjColumns.DataType = enzColDouble
+      mobjColumns.InputMask = ""
+      mobjSearch.Add mobjColumns
+      
+      mobjColumns.Caption = "Is Taxes Applied"
+      mobjColumns.ColumnWidth = 0
+      mobjColumns.FieldName = "IsTaxesApplied"
+      mobjColumns.InSearchCombo = False
+      mobjColumns.Selectable = True
+      mobjColumns.Alignment = LeftAlign
+      mobjColumns.CaptionAlignment = LeftAlign
+      mobjColumns.DataType = enzColBoolean
+      mobjColumns.InputMask = ""
+      mobjSearch.Add mobjColumns
+      
+      mobjColumns.Caption = "Integ Def. A/C ID"
+      mobjColumns.ColumnWidth = 0
+      mobjColumns.FieldName = "IntegDefAccID"
+      mobjColumns.InSearchCombo = False
+      mobjColumns.Selectable = True
+      mobjColumns.Alignment = LeftAlign
+      mobjColumns.CaptionAlignment = LeftAlign
+      mobjColumns.DataType = enzColText
+      mobjColumns.InputMask = gsobstrAccIDMask
+      mobjSearch.Add mobjColumns
+      
+      mobjColumns.Caption = "Disc. Category Blu Water"
+      mobjColumns.ColumnWidth = 0
+      mobjColumns.FieldName = "DiscCategory_BluWater"
+      mobjColumns.InSearchCombo = False
+      mobjColumns.Selectable = True
+      mobjColumns.DataType = enzColText
+      mobjColumns.Alignment = LeftAlign
+      mobjColumns.CaptionAlignment = LeftAlign
+      mobjColumns.InputMask = ""
+      mobjSearch.Add mobjColumns
+      
+      mobjColumns.Caption = "Rate Category Blu Water"
+      mobjColumns.ColumnWidth = 0
+      mobjColumns.FieldName = "RateCategory_BluWater"
+      mobjColumns.InSearchCombo = False
+      mobjColumns.Selectable = True
+      mobjColumns.DataType = enzColText
+      mobjColumns.Alignment = LeftAlign
+      mobjColumns.CaptionAlignment = LeftAlign
+      mobjColumns.InputMask = ""
+      mobjSearch.Add mobjColumns
+      
+      mobjColumns.Caption = "I.T Percentage"
+      mobjColumns.ColumnWidth = 0
+      mobjColumns.FieldName = "IncomeTaxPercentage"
+      mobjColumns.InSearchCombo = False
+      mobjColumns.Selectable = True
+      mobjColumns.Alignment = LeftAlign
+      mobjColumns.CaptionAlignment = LeftAlign
+      mobjColumns.DataType = enzColText
+      mobjColumns.InputMask = ""
+      mobjSearch.Add mobjColumns
+      
+      mobjColumns.Caption = "Customer Status"
+      mobjColumns.ColumnWidth = 0
+      mobjColumns.FieldName = "CustomerStatus"
+      mobjColumns.InSearchCombo = False
+      mobjColumns.Selectable = True
+      mobjColumns.DataType = enzColText
+      mobjColumns.Alignment = LeftAlign
+      mobjColumns.CaptionAlignment = LeftAlign
+      mobjColumns.InputMask = ""
+      mobjSearch.Add mobjColumns
+      
+      mobjColumns.Caption = "Dist. Shop"
+      mobjColumns.ColumnWidth = 0
+      mobjColumns.FieldName = "IsDistShop"
+      mobjColumns.InSearchCombo = False
+      mobjColumns.Selectable = True
+      mobjColumns.Alignment = CenterAlign
+      mobjColumns.CaptionAlignment = CenterAlign
+      mobjColumns.DataType = enzColText
+      mobjColumns.InputMask = ""
+      mobjSearch.Add mobjColumns
+      
+      Set objfrmSearch.Search = mobjSearch
+      objfrmSearch.QueryString = TempStr
+      Set objfrmSearch.ParentForm = Me
+      objfrmSearch.IsDisconnected = False
+      objfrmSearch.DefaultSearchField = 1
+      objfrmSearch.Caption = objfrmSearch.Caption & " - " & "Customer Information"
+      mscSearchCaller = scCustomer
+      objfrmSearch.Show
+      
+      Set mobjSearch = Nothing
+      
+   End If
+End Sub
+
+Private Sub mebSalesEntryDate_GotFocus()
+   Call SelectText(mebSalesEntryDate)
+End Sub
+
+Private Sub ShowValues(pstrRecordType As String, pintRecordID As Integer)
+   Dim i                         As Long
+
+   Dim varFG_ID                  As Variant, varBrandName         As Variant, varFGName               As Variant
+   Dim varUOM                    As Variant, varNoOfPacks         As Variant, varWeight               As Variant
+   Dim varBasicRate              As Variant, varSpecialDiscount   As Variant, varExcSTRate            As Variant
+   Dim varIncSTValue             As Variant, varSTRate            As Variant, varSTAmount             As Variant
+   Dim varExcSTValue             As Variant, varNetRate           As Variant, varEmptyCartons         As Variant
+   Dim varNoOfUnitsInPack        As Variant, varUnitWeight        As Variant, varForTonsConv          As Variant
+   Dim varEmptyCartonPercentage  As Variant, varFreightCharges    As Variant, varSoapChargesPerCarton As Variant
+   Dim varDistributorMargin      As Variant, varRetailerMargin    As Variant, varLeakageRate          As Variant
+   Dim varSEDRate                As Variant, varSEDAmount         As Variant, varDisc1_Percentage     As Variant
+   Dim varDisc1_Percentage_Value As Variant, varDisc2_PerPack     As Variant, varDisc2_PerPack_Value  As Variant
+   Dim varSG_ID                  As Variant
+   
+   Dim varSTAmount_17            As Variant
+   Dim varSTAmount_03            As Variant
+   
+   Dim varVATPercentage          As Variant
+   Dim varVATValue               As Variant
+   
+   Dim mrsSalInvDtl              As New ADODB.Recordset
+  
+   With mrsSalInvDtl
+      .ActiveConnection = AppCnn
+      .CursorLocation = adUseClient
+      .LockType = adLockReadOnly
+      .CursorType = adOpenStatic
+      .Source = "SELECT SE_Dtl.FG_ID, Brand_Title, FGName, UOM_Title, NoOfUnitsInPack, UnitWeight, ForTonsConversion, EmptyCartonPercentage, " & _
+                "SG_ID, NoOfPacks, Weight, BasicRate, SpecialDiscount, ExcSTRate, IncSTValue, STRate, STAmount, STAmount_17, STAmount_03, " & _
+                "ExcSTValue, NetRate, FreightCharges, SoapCharges, EmptyCartons, SE_Dtl.DistributorMargin, SE_Dtl.RetailerMargin, LeakageRate, " & _
+                "SEDRate, SEDAmount, Discount1_Percentage, Discount1_Percentage_Value, Discount2_PerPack, Discount2_PerPack_Value, VATPercentage, " & _
+                "VATValue FROM " & mstrSalesTableName & "Detail SE_Dtl INNER JOIN tblInvItemFG FG ON SE_Dtl.CompanyID = FG.CompanyID AND " & _
+                "SE_Dtl.FG_ID = FG.FG_ID INNER JOIN tblInvItemFGBrand FGBrand ON FG.Brand_ID = FGBrand.Brand_ID INNER JOIN tblInvItemFGUOM FGUOM " & _
+                "ON FG.UOM_ID = FGUOM.UOM_ID WHERE SE_Dtl.CompanyID = " & Val(gstrOrgID) & " AND SE_Dtl.FinYear = '" & gstrFinancialYear & "' AND " & _
+                "SE_Dtl.BillType = 'SI' AND SE_Dtl.SalesEntryType = 'BG' AND SE_Dtl.SalesEntryID = " & mebSalesEntryID.text & " ORDER BY SE_Dtl.FG_ID"
+                
+      .Open
+   End With
+
+   If mrsSalInvDtl.RecordCount > 0 Then
+
+      mrsSalInvDtl.MoveFirst
+
+      fpgTransaction.ReDraw = False
+      fpgTransaction.MaxRows = mrsSalInvDtl.RecordCount
+
+      i = 1
+      Do While mrsSalInvDtl.EOF = False
+
+         varFG_ID = mrsSalInvDtl.Fields("FG_ID").Value
+         
+         varBrandName = mrsSalInvDtl.Fields("Brand_Title").Value
+         varFGName = mrsSalInvDtl.Fields("FGName").Value
+         varUOM = mrsSalInvDtl.Fields("UOM_Title").Value
+         varNoOfUnitsInPack = mrsSalInvDtl.Fields("NoOfUnitsInPack").Value
+         varUnitWeight = mrsSalInvDtl.Fields("UnitWeight").Value
+         varForTonsConv = mrsSalInvDtl.Fields("ForTonsConversion").Value
+         varEmptyCartonPercentage = mrsSalInvDtl.Fields("EmptyCartonPercentage").Value
+         varSG_ID = mrsSalInvDtl.Fields("SG_ID").Value
+         
+         varNoOfPacks = mrsSalInvDtl.Fields("NoOfPacks").Value
+         varWeight = mrsSalInvDtl.Fields("Weight").Value
+         varBasicRate = mrsSalInvDtl.Fields("BasicRate").Value
+         varSpecialDiscount = mrsSalInvDtl.Fields("SpecialDiscount").Value
+         varExcSTRate = mrsSalInvDtl.Fields("ExcSTRate").Value
+         varIncSTValue = mrsSalInvDtl.Fields("IncSTValue").Value
+         varSTRate = mrsSalInvDtl.Fields("STRate").Value
+         varSTAmount = mrsSalInvDtl.Fields("STAmount").Value
+         
+         varSTAmount_17 = mrsSalInvDtl.Fields("STAmount_17").Value
+         varSTAmount_03 = mrsSalInvDtl.Fields("STAmount_03").Value
+         
+         varExcSTValue = mrsSalInvDtl.Fields("ExcSTValue").Value
+         varNetRate = mrsSalInvDtl.Fields("NetRate").Value
+         varEmptyCartons = mrsSalInvDtl.Fields("EmptyCartons").Value
+         varFreightCharges = mrsSalInvDtl.Fields("FreightCharges").Value
+         varSoapChargesPerCarton = mrsSalInvDtl.Fields("SoapCharges").Value
+         varDistributorMargin = mrsSalInvDtl.Fields("DistributorMargin").Value
+         varRetailerMargin = mrsSalInvDtl.Fields("RetailerMargin").Value
+         varLeakageRate = mrsSalInvDtl.Fields("LeakageRate").Value
+         varSEDRate = mrsSalInvDtl.Fields("SEDRate").Value
+         varSEDAmount = mrsSalInvDtl.Fields("SEDAmount").Value
+         varDisc1_Percentage = mrsSalInvDtl.Fields("Discount1_Percentage").Value
+         varDisc1_Percentage_Value = mrsSalInvDtl.Fields("Discount1_Percentage_Value").Value
+         varDisc2_PerPack = mrsSalInvDtl.Fields("Discount2_PerPack").Value
+         varDisc2_PerPack_Value = mrsSalInvDtl.Fields("Discount2_PerPack_Value").Value
+         
+         varVATPercentage = mrsSalInvDtl.Fields("VATPercentage").Value
+         varVATValue = mrsSalInvDtl.Fields("VATValue").Value
+
+         With fpgTransaction
+
+            .SetText 1, i, varFG_ID
+            .SetText 2, i, varBrandName
+            .SetText 3, i, varFGName
+            .SetText 4, i, varNoOfPacks
+            .SetText 5, i, varWeight
+            .SetText 6, i, varUOM
+            .SetText 7, i, varBasicRate
+            .SetText 8, i, Format(varSpecialDiscount, "##,##0.000")
+            .SetText 9, i, Format(varExcSTRate, "##,##0.000")
+            .SetText 10, i, Format(varIncSTValue, "##,##0.00")
+            .SetText 11, i, varSTRate
+            .SetText 12, i, Format(varSTAmount, "##,##0.00")
+            .SetText 13, i, Format(varExcSTValue, "##,##0.00")
+            .SetText 14, i, varNetRate
+            .SetText 15, i, varEmptyCartons
+            .SetText 16, i, varNoOfUnitsInPack
+            .SetText 17, i, varUnitWeight
+            .SetText 18, i, varForTonsConv
+            .SetText 19, i, varEmptyCartonPercentage
+            .SetText 20, i, varFreightCharges
+            .SetText 21, i, varSoapChargesPerCarton
+            .SetText 22, i, varDistributorMargin
+            .SetText 23, i, varRetailerMargin
+            .SetText 24, i, varLeakageRate
+            .SetText 25, i, varVATPercentage
+            .SetText 26, i, Format(varVATValue, "##,##0.00")
+            .SetText 27, i, varDisc1_Percentage
+            .SetText 28, i, varDisc1_Percentage_Value
+            .SetText 29, i, varDisc2_PerPack
+            .SetText 30, i, varDisc2_PerPack_Value
+            .SetText 31, i, varSG_ID
+            .SetText 32, i, Format(varSTAmount_17, "##,##0.00")
+            .SetText 33, i, Format(varSTAmount_03, "##,##0.00")
+
+         End With
+
+         i = i + 1
+         mrsSalInvDtl.MoveNext
+
+      Loop
+
+      fpgTransaction.ReDraw = True
+
+      fpgTransaction.SetActiveCell 1, 1
+
+   End If
+   
+   mrsSalInvDtl.Close
+   Set mrsSalInvDtl = Nothing
+End Sub
+
+Private Sub SetGridLayout()
+   With fpgTransaction
+
+      .ReDraw = False
+
+      .Reset
+      .GrayAreaBackColor = &HE0E0E0
+      .Font = "Tahoma"
+      .FontSize = "8"
+      .RowHeight(0) = 35
+      .SelectBlockOptions = 2
+      .EditModeReplace = True
+      .EditEnterAction = EditEnterActionNext
+      .AllowDragDrop = False
+
+      .MaxCols = 34
+
+      .SetText 1, 0, "FG CODE"
+      .SetText 2, 0, "BRAND NAME"
+      .SetText 3, 0, "FG NAME"
+      .SetText 4, 0, "NO. OF PACKS"
+      .SetText 5, 0, "WEIGHT"
+      .SetText 6, 0, "UOM"
+      .SetText 7, 0, "PRICE (Â£)"
+      .SetText 8, 0, "Special Discount"
+      .SetText 9, 0, "Exc. S.T Rate"
+      .SetText 10, 0, "Inc. S.T Value"
+      .SetText 11, 0, "S.T %"
+      .SetText 12, 0, "S.T Amount"
+      .SetText 13, 0, "SALES VALUE (Â£)"
+      .SetText 14, 0, "NET RATE (Â£)"
+      .SetText 15, 0, "Empty Cartons"
+      .SetText 16, 0, "No. of Units in Pack"
+      .SetText 17, 0, "Unit Weight"
+      .SetText 18, 0, "For Tons Conversion"
+      .SetText 19, 0, "Empty Carton Percentage"
+      .SetText 20, 0, "Freight Charges Per Basic Unit"
+      .SetText 21, 0, "Soap Charges Per Carton"
+      .SetText 22, 0, "Distributor Margin"
+      .SetText 23, 0, "Retailer Margin"
+      .SetText 24, 0, "Leakage Rate"
+      .SetText 25, 0, "VAT %"
+      .SetText 26, 0, "VAT VALUE(Â£)"
+      .SetText 27, 0, "Discount # 1 (% on Exc. Value)"
+      .SetText 28, 0, "Discount # 1 (Value)"
+      .SetText 29, 0, "Discount # 2 (Per Pack)"
+      .SetText 30, 0, "Discount # 2 (Value)"
+      .SetText 31, 0, "SG_ID"
+      .SetText 32, 0, "Regular S.T"
+      .SetText 33, 0, "Extra S.T (3%)"
+      .SetText 34, 0, "AIPL FG Code"
+
+      fpgSetGridColDataType fpgTransaction, 1, fpgEdit
+      fpgSetGridColDataType fpgTransaction, 2, fpgLabel
+      fpgSetGridColDataType fpgTransaction, 3, fpgLabel
+      fpgSetGridColDataType fpgTransaction, 4, fpgNumber, 9, 2
+      fpgSetGridColDataType fpgTransaction, 5, fpgLabel
+      fpgSetGridColDataType fpgTransaction, 6, fpgLabel
+      fpgSetGridColDataType fpgTransaction, 7, fpgNumber, 9, 3
+      fpgSetGridColDataType fpgTransaction, 8, fpgNumber, 9, 3
+      fpgSetGridColDataType fpgTransaction, 9, fpgLabel
+      fpgSetGridColDataType fpgTransaction, 10, fpgLabel
+      fpgSetGridColDataType fpgTransaction, 11, fpgLabel
+      fpgSetGridColDataType fpgTransaction, 12, fpgLabel
+      fpgSetGridColDataType fpgTransaction, 13, fpgLabel
+      fpgSetGridColDataType fpgTransaction, 14, fpgLabel
+      fpgSetGridColDataType fpgTransaction, 15, fpgLabel
+      fpgSetGridColDataType fpgTransaction, 16, fpgLabel
+      fpgSetGridColDataType fpgTransaction, 17, fpgLabel
+      fpgSetGridColDataType fpgTransaction, 18, fpgLabel
+      fpgSetGridColDataType fpgTransaction, 19, fpgLabel
+      fpgSetGridColDataType fpgTransaction, 20, fpgLabel
+      fpgSetGridColDataType fpgTransaction, 21, fpgLabel
+      fpgSetGridColDataType fpgTransaction, 22, fpgLabel
+      fpgSetGridColDataType fpgTransaction, 23, fpgLabel
+      fpgSetGridColDataType fpgTransaction, 24, fpgLabel
+      fpgSetGridColDataType fpgTransaction, 25, fpgNumber, 2
+      fpgSetGridColDataType fpgTransaction, 26, fpgLabel
+      fpgSetGridColDataType fpgTransaction, 27, fpgNumber, 9, 2
+      fpgSetGridColDataType fpgTransaction, 28, fpgLabel
+      fpgSetGridColDataType fpgTransaction, 29, fpgNumber, 9, 2
+      fpgSetGridColDataType fpgTransaction, 30, fpgLabel
+      fpgSetGridColDataType fpgTransaction, 31, fpgLabel
+      fpgSetGridColDataType fpgTransaction, 32, fpgLabel
+      fpgSetGridColDataType fpgTransaction, 33, fpgLabel
+      fpgSetGridColDataType fpgTransaction, 34, fpgLabel
+
+      fpgSetColResize fpgTransaction, 1, True
+      fpgSetColResize fpgTransaction, 2, False
+      fpgSetColResize fpgTransaction, 3, True
+      fpgSetColResize fpgTransaction, 4, True
+      fpgSetColResize fpgTransaction, 5, True
+      fpgSetColResize fpgTransaction, 6, True
+      fpgSetColResize fpgTransaction, 7, True
+      fpgSetColResize fpgTransaction, 8, False
+      fpgSetColResize fpgTransaction, 9, False
+      fpgSetColResize fpgTransaction, 10, False
+      fpgSetColResize fpgTransaction, 11, False
+      fpgSetColResize fpgTransaction, 12, False
+      fpgSetColResize fpgTransaction, 13, True
+      fpgSetColResize fpgTransaction, 14, False
+      fpgSetColResize fpgTransaction, 15, False
+      fpgSetColResize fpgTransaction, 16, False
+      fpgSetColResize fpgTransaction, 17, False
+      fpgSetColResize fpgTransaction, 18, False
+      fpgSetColResize fpgTransaction, 19, False
+      fpgSetColResize fpgTransaction, 20, False
+      fpgSetColResize fpgTransaction, 21, False
+      fpgSetColResize fpgTransaction, 22, False
+      fpgSetColResize fpgTransaction, 23, False
+      fpgSetColResize fpgTransaction, 24, False
+      fpgSetColResize fpgTransaction, 25, True
+      fpgSetColResize fpgTransaction, 26, True
+      fpgSetColResize fpgTransaction, 27, False
+      fpgSetColResize fpgTransaction, 28, False
+      fpgSetColResize fpgTransaction, 29, False
+      fpgSetColResize fpgTransaction, 30, False
+      fpgSetColResize fpgTransaction, 31, False
+      fpgSetColResize fpgTransaction, 32, False
+      fpgSetColResize fpgTransaction, 33, False
+      fpgSetColResize fpgTransaction, 34, False
+      
+      .ColWidth(1) = 7
+      .ColWidth(2) = 0
+      .ColWidth(3) = 32
+      .ColWidth(4) = 8
+      .ColWidth(5) = 8
+      .ColWidth(6) = 7
+      .ColWidth(7) = 8
+      .ColWidth(8) = 0
+      .ColWidth(9) = 0
+      .ColWidth(10) = 0
+      .ColWidth(11) = 0
+      .ColWidth(12) = 0
+      .ColWidth(13) = 10
+      .ColWidth(14) = 8
+      .ColWidth(15) = 0
+      .ColWidth(16) = 0
+      .ColWidth(17) = 0
+      .ColWidth(18) = 0
+      .ColWidth(19) = 0
+      .ColWidth(20) = 0
+      .ColWidth(21) = 0
+      .ColWidth(22) = 0
+      .ColWidth(23) = 0
+      .ColWidth(24) = 0
+      .ColWidth(25) = 8
+      .ColWidth(26) = 10
+      .ColWidth(27) = 0
+      .ColWidth(28) = 0
+      .ColWidth(29) = 0
+      .ColWidth(30) = 0
+      .ColWidth(31) = 0
+      .ColWidth(32) = 0
+      .ColWidth(33) = 0
+      .ColWidth(34) = 0
+
+      .MaxRows = 1
+      
+      .Col = 1
+      .TypeMaxEditLen = 3
+      .TypeHAlign = TypeHAlignCenter
+      .TypeVAlign = TypeVAlignCenter
+      
+      .Col = 2
+      .TypeTextWordWrap = True
+      .TypeVAlign = TypeVAlignCenter
+      
+      .Col = 3
+      .TypeTextWordWrap = True
+      .TypeVAlign = TypeVAlignCenter
+      
+      .Col = 4
+      .TypeHAlign = TypeHAlignRight
+      .TypeVAlign = TypeVAlignCenter
+      
+      .Col = 5
+      .TypeHAlign = TypeHAlignRight
+      .TypeVAlign = TypeVAlignCenter
+
+      .Col = 6
+      .TypeHAlign = TypeHAlignCenter
+      .TypeVAlign = TypeVAlignCenter
+
+      .Col = 7
+      .TypeHAlign = TypeHAlignRight
+      .TypeVAlign = TypeVAlignCenter
+
+      .Col = 8
+      .TypeHAlign = TypeHAlignRight
+      .TypeVAlign = TypeVAlignCenter
+
+      .Col = 9
+      .TypeHAlign = TypeHAlignRight
+      .TypeVAlign = TypeVAlignCenter
+
+      .Col = 10
+      .TypeHAlign = TypeHAlignRight
+      .TypeVAlign = TypeVAlignCenter
+
+      .Col = 11
+      .TypeHAlign = TypeHAlignRight
+      .TypeVAlign = TypeVAlignCenter
+
+      .Col = 12
+      .TypeHAlign = TypeHAlignRight
+      .TypeVAlign = TypeVAlignCenter
+
+      .Col = 13
+      .TypeHAlign = TypeHAlignRight
+      .TypeVAlign = TypeVAlignCenter
+      
+      .Col = 14
+      .TypeHAlign = TypeHAlignRight
+      .TypeVAlign = TypeVAlignCenter
+      
+      .Col = 15
+      .TypeHAlign = TypeHAlignRight
+      .TypeVAlign = TypeVAlignCenter
+      
+      .Col = 16
+      .TypeHAlign = TypeHAlignRight
+      .TypeVAlign = TypeVAlignCenter
+      
+      .Col = 17
+      .TypeHAlign = TypeHAlignRight
+      .TypeVAlign = TypeVAlignCenter
+      
+      .Col = 18
+      .TypeHAlign = TypeHAlignRight
+      .TypeVAlign = TypeVAlignCenter
+      
+      .Col = 19
+      .TypeHAlign = TypeHAlignRight
+      .TypeVAlign = TypeVAlignCenter
+      
+      .Col = 20
+      .TypeHAlign = TypeHAlignRight
+      .TypeVAlign = TypeVAlignCenter
+      
+      .Col = 21
+      .TypeHAlign = TypeHAlignRight
+      .TypeVAlign = TypeVAlignCenter
+      
+      .Col = 22
+      .TypeHAlign = TypeHAlignRight
+      .TypeVAlign = TypeVAlignCenter
+      
+      .Col = 23
+      .TypeHAlign = TypeHAlignRight
+      .TypeVAlign = TypeVAlignCenter
+      
+      .Col = 24
+      .TypeHAlign = TypeHAlignRight
+      .TypeVAlign = TypeVAlignCenter
+      
+      .Col = 25
+      .TypeHAlign = TypeHAlignRight
+      .TypeVAlign = TypeVAlignCenter
+
+      .Col = 26
+      .TypeHAlign = TypeHAlignRight
+      .TypeVAlign = TypeVAlignCenter
+      
+      .Col = 27
+      .TypeHAlign = TypeHAlignRight
+      .TypeVAlign = TypeVAlignCenter
+      
+      .Col = 28
+      .TypeHAlign = TypeHAlignRight
+      .TypeVAlign = TypeVAlignCenter
+      
+      .Col = 29
+      .TypeHAlign = TypeHAlignRight
+      .TypeVAlign = TypeVAlignCenter
+      
+      .Col = 30
+      .TypeHAlign = TypeHAlignRight
+      .TypeVAlign = TypeVAlignCenter
+      
+      .Col = 31
+      .TypeHAlign = TypeHAlignCenter
+      .TypeVAlign = TypeVAlignCenter
+      
+      .Col = 32
+      .TypeVAlign = TypeVAlignCenter
+      .TypeHAlign = TypeHAlignRight
+      
+      .Col = 33
+      .TypeHAlign = TypeHAlignRight
+      .TypeVAlign = TypeVAlignCenter
+      
+      .Col = 34
+      .TypeHAlign = TypeHAlignCenter
+      .TypeVAlign = TypeVAlignCenter
+      
+      .ColsFrozen = 9
+      
+      .RowHeight(-1) = 25
+
+      .SetActiveCell 1, 1
+
+      .ReDraw = True
+
+   End With
+End Sub
+
+Private Sub SetFormMode()
+   Select Case mvarFormMode
+      Case enzAddMode
+         Me.Caption = mstrFrmCaption & " [ Add ]"
+      Case enzEditMode
+         Me.Caption = mstrFrmCaption & " [ Edit ]"
+      Case enzDeleteMode
+         Me.Caption = mstrFrmCaption & " [ Delete ]"
+      Case enzViewMode
+         Me.Caption = mstrFrmCaption & " [ View ]"
+   End Select
+End Sub
+
+Private Function ValidateFPGrid() As Boolean
+   Dim i                As Long
+   Dim lngMaxRows       As Long
+
+   Dim varFG_ID         As Variant
+   Dim varFGName        As Variant
+   Dim varNoOfPacks     As Variant
+   Dim varBasicRate     As Variant
+   Dim varVATPersentage As Variant
+
+   ValidateFPGrid = False
+
+   lngMaxRows = fpgTransaction.MaxRows
+   i = 1
+
+   Do While i <= lngMaxRows
+
+      With fpgTransaction
+
+         .GetText 1, i, varFG_ID
+         .GetText 3, i, varFGName
+         .GetText 4, i, varNoOfPacks
+         .GetText 7, i, varBasicRate
+         .GetText 25, i, varVATPersentage
+
+         If Len(varFG_ID) = 0 And Val(varNoOfPacks) = 0 And Val(varBasicRate) = 0 Then
+
+            If fpgTransaction.MaxRows > 1 Then
+               .Row = i
+               .Action = 5
+               .MaxRows = .MaxRows - 1
+               lngMaxRows = lngMaxRows - 1
+
+               i = i - 1
+
+            Else
+               MsgBox "At least one transaction is required in detail section.", vbExclamation + vbOKOnly, App.ProductName
+               fpgTransaction.SetFocus
+               Exit Function
+
+            End If
+
+         Else
+            If Len(varFG_ID) <> Len(gsobstrFGIDMask) Or Len(varFGName) = 0 Then
+               MsgBox "FG Code is not valid." & vbCrLf & "Line No.: " & i & ".", vbExclamation + vbOKOnly, App.ProductName
+               fpgTransaction.SetFocus
+               fpgTransaction.SetActiveCell 1, i
+               Exit Function
+
+            Else
+               If GetIDTitle("tblInvItemFG", "FG_ID", CStr(varFG_ID), "FG_ID") = "" Then
+                  MsgBox "FG Code does not exist." & vbCrLf & "Line No.: " & i & ".", vbExclamation + vbOKOnly, App.ProductName
+                  fpgTransaction.SetFocus
+                  fpgTransaction.SetActiveCell 1, i
+                  Exit Function
+               End If
+               
+            End If
+               
+            If Val(varNoOfPacks) = 0 Then
+               MsgBox "No. Of Packs cannot be zero(0)." & vbCrLf & "Line No.: " & i & ".", vbExclamation + vbOKOnly, App.ProductName
+               fpgTransaction.SetFocus
+               fpgTransaction.SetActiveCell 4, i
+               Exit Function
+            End If
+            
+            If Val(varBasicRate) = 0 Then
+               MsgBox "Basic Rate cannot be zero(0)." & vbCrLf & "Line No.: " & i & ".", vbExclamation + vbOKOnly, App.ProductName
+               fpgTransaction.SetFocus
+               fpgTransaction.SetActiveCell 7, i
+               Exit Function
+            End If
+            
+            If Val(varVATPersentage) > 0 And Val(varVATPersentage) <> 20 Then
+               MsgBox "Standard VAT Rate is 20%. Please check input." & vbCrLf & "Line No.: " & i & ".", vbExclamation + vbOKOnly, App.ProductName
+               fpgTransaction.SetFocus
+               fpgTransaction.SetActiveCell 25, i
+               Exit Function
+            End If
+
+         End If
+
+      End With
+
+      i = i + 1
+
+   Loop
+
+   ValidateFPGrid = True
+End Function
+
+Private Sub CalculateTotals()
+   Dim intCounter                      As Integer
+   
+   Dim dblTotalWeight                  As Double, dblTotalTons          As Double
+   Dim dblTotalExcSTValue              As Double, dblTotalSTValue       As Double
+   Dim dblTotalIncSTValue              As Double, dblTotalEmptyCartons  As Double
+   Dim dblTotalFreightCharges          As Double, dblTotalSoapCharges   As Double
+   Dim dblTotalSEDValue                As Double
+   
+   Dim dblTotalSTValue_17              As Double
+   Dim dblTotalSTValue_03              As Double
+   
+   Dim dblTotalDisc1_Percentage_Value  As Variant
+   Dim dblTotalDisc2_PerPack_Value     As Variant
+   
+   Dim dblTotalVATValue                As Variant
+
+   Dim varNoOfPacks                    As Variant, varWeight            As Variant
+   Dim varTons                         As Variant, varExcSTValue        As Variant
+   Dim varSTValue                      As Variant, varIncSTValue        As Variant
+   Dim varEmptyCartons                 As Variant, varForTonsConv       As Variant
+   Dim varFreightCharges               As Variant, varSoapCharges       As Variant
+   Dim varSEDValue                     As Variant
+   
+   Dim varSTValue_17                   As Variant
+   Dim varSTValue_03                   As Variant
+   
+   Dim varDisc1_Percentage_Value       As Variant
+   Dim varDisc2_PerPack_Value          As Variant
+   
+   Dim varVATValue                     As Variant
+
+   dblTotalWeight = 0
+   dblTotalTons = 0
+   dblTotalExcSTValue = 0
+   dblTotalSEDValue = 0
+   dblTotalSTValue = 0
+   
+   dblTotalSTValue_17 = 0
+   dblTotalSTValue_03 = 0
+   
+   dblTotalIncSTValue = 0
+   dblTotalEmptyCartons = 0
+   dblTotalFreightCharges = 0
+   dblTotalSoapCharges = 0
+   
+   dblTotalDisc1_Percentage_Value = 0
+   dblTotalDisc2_PerPack_Value = 0
+   
+   dblTotalVATValue = 0
+
+   fpgTransaction.ReDraw = False
+   
+   With fpgTransaction
+      infTotalWeight.Caption = Format(0#, "##,##0.00")
+
+      For intCounter = 1 To .MaxRows
+         .GetText 5, intCounter, varTons
+         .GetText 18, intCounter, varForTonsConv
+         dblTotalTons = Val(dblTotalTons) + ((Val(Format(varTons, "####0.00")) * Val(varForTonsConv)) / 1000)
+      Next
+
+      infTotalWeight.Caption = Format(Val(dblTotalTons), "##,##0.00")
+   End With
+   
+   With fpgTransaction
+      infExcSEDnSTValue.Caption = Format(0#, "##,##0.00")
+
+      For intCounter = 1 To .MaxRows
+         .GetText 13, intCounter, varExcSTValue
+         dblTotalExcSTValue = Val(dblTotalExcSTValue) + Val(Format(varExcSTValue, "####0.00"))
+      Next
+
+      infExcSEDnSTValue.Caption = Format(Val(dblTotalExcSTValue), "##,##0.00")
+   End With
+   
+   With fpgTransaction
+      infVATValue.Caption = Format(0#, "##,##0.00")
+
+      For intCounter = 1 To .MaxRows
+         .GetText 26, intCounter, varVATValue
+         dblTotalVATValue = Val(dblTotalVATValue) + Val(Format(varVATValue, "####0.00"))
+      Next
+
+      infVATValue.Caption = Format(Val(dblTotalVATValue), "##,##0.00")
+   End With
+   
+   infNetValue.Caption = Format(Val(dblTotalExcSTValue) + Val(dblTotalVATValue), "##,##0.00")
+   
+   fpgTransaction.ReDraw = True
+End Sub
+
+Private Function ApplySavingRoutine(pFormMode As enzFormMode) As Boolean
+On Error GoTo ErrorHandler
+
+   Dim blnTransAppCnn   As Boolean
+   
+   ApplySavingRoutine = True
+
+   If pFormMode = enzAddMode Then
+
+      mebSalesEntryID.text = NEW_GetNewSalesEntryID_Typewise("BG")
+
+   End If
+
+   AppCnn.BeginTrans
+   blnTransAppCnn = True
+
+      Call SaveRecord(AppCnn, pFormMode)
+      
+      Call AddActivity(AppCnn, mstrFrmCaption, IIf(mvarFormMode = enzAddMode, enzActivityAdd, enzActivityEdit), _
+                       "BG - " & Right("00000" & mebSalesEntryID.text, 6), gstrMachineName, Val(gstrOrgID))
+
+   AppCnn.CommitTrans
+   blnTransAppCnn = False
+   
+   Exit Function
+
+ErrorHandler:
+   If blnTransAppCnn = True Then
+      AppCnn.RollbackTrans
+      blnTransAppCnn = False
+   End If
+   
+   ApplySavingRoutine = False
+
+   MsgBox "Error Code: " & Err.Number & vbCrLf & _
+          "Error Description: " & Err.Description, vbCritical + vbOKOnly, App.ProductName
+End Function
+
+Private Sub SaveRecord(pDBConnection As ADODB.Connection, pFormMode As enzFormMode)
+   Dim i                      As Long
+   
+   Dim varFG_ID               As Variant, varNoOfPacks            As Variant, varWeight                  As Variant
+   Dim varBasicRate           As Variant, varSpecialDiscount      As Variant, varExcSTRate               As Variant
+   Dim varIncSTValue          As Variant, varSTRate               As Variant, varSTAmount                As Variant
+   Dim varExcSTValue          As Variant, varNetRate              As Variant, varEmptyCartons            As Variant
+   Dim varFreightCharges      As Variant, varSoapCharges          As Variant, varDistributorMargin       As Variant
+   Dim varRetailerMargin      As Variant, varLeakageRate          As Variant, varSEDRate                 As Variant
+   Dim varSEDAmount           As Variant, varDisc1_Percentage     As Variant, varDisc1_Percentage_Value  As Variant
+   Dim varDisc2_PerPack       As Variant, varDisc2_PerPack_Value  As Variant, varSG_ID                   As Variant
+   
+   Dim varSTAmount_17         As Variant
+   Dim varSTAmount_03         As Variant
+   
+   Dim strQuery               As String
+   
+   Dim strCheckedStatus       As String
+   
+   Dim strCustCode            As String
+   
+   Dim varVATPercentage       As Variant
+   Dim varVATValue            As Variant
+   
+   strCustCode = "'" & mebCustomerCode.text & "'"
+      
+   If pFormMode = enzAddMode Then
+
+      strCheckedStatus = "'0', 'N/A'"
+      
+      '''" & cboWarehouse.ItemData(cboWarehouse.ListIndex) & "
+      strQuery = "INSERT INTO " & mstrSalesTableName & "(CompanyID, FinYear, SalesEntryType, SalesEntryID, BillType, SalesEntryDate, OrderID, " & _
+                 "VehicleRegNo, CustomerID, TotalExcSTValue, TotalVATValue, TotalSEDValue, TotalSTValue, TotalSTValue_17, TotalSTValue_03, " & _
+                 "TotalIncSTValue, TotalDiscount1_Percentage_Value, TotalDiscount2_PerPack_Value, NetAmount, TotalWeightInTons, " & _
+                 "TotalBGheenCOilWeight, TotalFreightCharges, TotalSoapCharges, TotalEmptyCartons, FreightApplied, StockLocationID, DeliveredTo, " & _
+                 "IsIncludeInIncentiveBulk, IsIncludeInIncentiveConsumer, IsIncludeInIncentiveRSO, CreditDays, LastModifiedBy, Checked, CheckedBy, " & _
+                 "Authorized, AuthorizedBy, Station, VouType, VouNo, Station1, VouType1, VouNo1, TotalCommission, IncomeTaxPercentage, IncomeTax, " & _
+                 "IncomeTaxIncValue, SalesDiscounts, CustCode_SalesProm, SK_STPercentage, Warehouse, CarriageCharges, Currency, CurrencyRate) " & _
+                 "VALUES(" & Val(gstrOrgID) & ", '" & gstrFinancialYear & "', 'BG', " & mebSalesEntryID.text & ", 'SI', " & _
+                 "'" & Format(mebSalesEntryDate.text, gstrdbDateFormat) & "', NULL, '" & UCase(Trim(txtVehRegNo.text)) & "', " & strCustCode & ", " & _
+                 Val(Format(infExcSEDnSTValue.Caption, "####0.00")) & ", " & Val(Format(infVATValue.Caption, "####0.00")) & ", 0, 0, 0, 0, " & _
+                 Val(Format(infNetValue.Caption, "####0.00")) & ", 0, 0, " & Val(Format(infNetValue.Caption, "####0.00")) & ", " & _
+                 Val(Format(infTotalWeight.Caption, "####0.00")) & ", 0, 0, 0, 0, '0', 3, '" & SetNAFields(txtDeliveredTo.text) & "', '0', '0', " & _
+                 "'0', 0, '" & gstrUser & "', " & strCheckedStatus & ", '0', 'N/A', NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, 0, 0, 'N', NULL, 0, " & _
+                 "'', 0, '', 0)" '''" & cboWarehouse.text & "
+         
+   ElseIf pFormMode = enzEditMode Or pFormMode = enzViewMode Then
+   
+      strCheckedStatus = "Checked = '0', CheckedBy = 'N/A'"
+
+      strQuery = "UPDATE " & mstrSalesTableName & " SET " & _
+                 "SalesEntryDate = '" & Format(mebSalesEntryDate.text, gstrdbDateFormat) & "', " & _
+                 "VehicleRegNo = '" & UCase(Trim(txtVehRegNo.text)) & "', CustomerID = " & strCustCode & ", " & _
+                 "TotalExcSTValue = " & Val(Format(infExcSEDnSTValue.Caption, "####0.00")) & ", " & _
+                 "TotalVATValue = " & Val(Format(infVATValue.Caption, "####0.00")) & ", " & _
+                 "TotalIncSTValue = " & Val(Format(infNetValue.Caption, "####0.00")) & ", " & _
+                 "NetAmount = " & Val(Format(infNetValue.Caption, "####0.00")) & ", " & _
+                 "TotalWeightInTons = " & Val(Format(infTotalWeight.Caption, "####0.00")) & ", " & _
+                 "DeliveredTo = '" & SetNAFields(txtDeliveredTo.text) & "', " & _
+                 "LastModifiedBy = '" & gstrUser & "', " & strCheckedStatus & ", CheckedDate = NULL " & _
+                 "WHERE CompanyID = " & Val(gstrOrgID) & " AND FinYear = '" & gstrFinancialYear & "' AND BillType = 'SI' AND " & _
+                 "SalesEntryType = 'BG' AND SalesEntryID = " & mebSalesEntryID.text ''', Warehouse = '" & cboWarehouse.text & "'
+                 
+   End If
+
+   pDBConnection.Execute (strQuery)
+
+   If pFormMode = enzEditMode Or pFormMode = enzViewMode Then
+
+      pDBConnection.Execute "DELETE FROM " & mstrSalesTableName & "Detail WHERE CompanyID = " & Val(gstrOrgID) & " AND " & _
+                            "FinYear = '" & gstrFinancialYear & "' AND BillType = 'SI' AND " & _
+                            "SalesEntryType = 'BG' AND SalesEntryID = " & mebSalesEntryID.text
+
+   End If
+
+   For i = 1 To fpgTransaction.MaxRows
+
+      With fpgTransaction
+
+         .GetText 1, i, varFG_ID
+         .GetText 4, i, varNoOfPacks
+         .GetText 5, i, varWeight
+         .GetText 7, i, varBasicRate
+         .GetText 8, i, varSpecialDiscount
+         .GetText 9, i, varExcSTRate
+         .GetText 10, i, varIncSTValue
+         .GetText 11, i, varSTRate
+         .GetText 12, i, varSTAmount
+         .GetText 13, i, varExcSTValue
+         .GetText 14, i, varNetRate
+         .GetText 15, i, varEmptyCartons
+         .GetText 20, i, varFreightCharges
+         .GetText 21, i, varSoapCharges
+         .GetText 22, i, varDistributorMargin
+         .GetText 23, i, varRetailerMargin
+         .GetText 24, i, varLeakageRate
+         .GetText 25, i, varVATPercentage
+         .GetText 26, i, varVATValue
+         .GetText 27, i, varDisc1_Percentage
+         .GetText 28, i, varDisc1_Percentage_Value
+         .GetText 29, i, varDisc2_PerPack
+         .GetText 30, i, varDisc2_PerPack_Value
+         .GetText 31, i, varSG_ID
+         
+         .GetText 32, i, varSTAmount_17
+         .GetText 33, i, varSTAmount_03
+         
+         If Val(varFG_ID) > 0 Then
+         
+            strQuery = "INSERT INTO " & mstrSalesTableName & "Detail(CompanyID, FinYear, SalesEntryType, SalesEntryID, BillType, " & _
+                       "FG_ID, NoOfPacks, Weight, BasicRate, SpecialDiscount, ExcSTRate, IncSTValue, SEDRate, " & _
+                       "SEDAmount, STRate, STAmount, STAmount_17, STAmount_03, ExcSTValue, NetRate, FreightCharges, SoapCharges, " & _
+                       "EmptyCartons, DistributorMargin, RetailerMargin, LeakageRate, Discount1_Percentage, " & _
+                       "Discount1_Percentage_Value, Discount2_PerPack, Discount2_PerPack_Value, " & _
+                       "IsIncludeInIncentiveBulk, IsIncludeInIncentiveConsumer, IsIncludeInIncentiveRSO, VATPercentage, VATValue) VALUES(" & _
+                       Val(gstrOrgID) & ", '" & gstrFinancialYear & "', 'BG', " & _
+                       mebSalesEntryID.text & ", 'SI', " & varFG_ID & ", " & Val(varNoOfPacks) & ", " & _
+                       Val(varWeight) & ", " & Val(varBasicRate) & ", " & _
+                       Val(Format(varSpecialDiscount, "####0.000")) & ", " & _
+                       Val(Format(varExcSTRate, "####0.000")) & ", " & Val(Format(varIncSTValue, "####0.00")) & ", " & _
+                       Val(varSEDRate) & ", " & Val(Format(varSEDAmount, "####0.00")) & ", " & Val(varSTRate) & ", " & _
+                       Val(Format(varSTAmount, "####0.00")) & ", " & Val(Format(varSTAmount_17, "####0.00")) & ", " & _
+                       Val(Format(varSTAmount_03, "####0.00")) & ", " & Val(Format(varExcSTValue, "####0.00")) & ", " & _
+                       Val(varNetRate) & ", " & Val(Format(varFreightCharges, "####0.00")) & ", " & _
+                       Val(Format(varSoapCharges, "####0.00")) & ", " & Val(varEmptyCartons) & ", " & _
+                       Val(Format(varDistributorMargin, "####0.00")) & ", " & _
+                       Val(Format(varRetailerMargin, "####0.00")) & ", " & _
+                       Val(Format(varLeakageRate, "####0.00")) & ", " & Val(varDisc1_Percentage) & ", " & _
+                       Val(Format(varDisc1_Percentage_Value, "####0.00")) & ", " & Val(varDisc2_PerPack) & ", " & _
+                       Val(Format(varDisc2_PerPack_Value, "####0.00")) & ", '0', '0', '0', " & Val(Format(varVATPercentage, "####0.00")) & ", " & _
+                       Val(Format(varVATValue, "####0.00")) & ")"
+   
+            pDBConnection.Execute (strQuery)
+               
+         End If
+         
+      End With
+
+   Next i
+   
+   If infDistShop.Caption = "Y" Then
+      AppCnn.Execute ("UPDATE " & mstrSalesTableName & " SET Checked = '1', CheckedBy = '" & gstrUser & "', CheckedDate = getDate(), " & _
+                      "Authorized = '1', AuthorizedBy = '" & gstrUser & "', AuthorizedDate = getDate() " & _
+                      "WHERE CompanyID = " & Val(gstrOrgID) & " AND FinYear = '" & gstrFinancialYear & "' AND BillType = 'SI' AND " & _
+                      "SalesEntryType = 'BG' AND SalesEntryID = " & mebSalesEntryID.text)
+   End If
+End Sub
+
+Private Sub PostingProcess(pDBConnection As ADODB.Connection, pstrRecordType As String, pintRecordID As Integer)
+   Dim ObjInt2    As New Integration: Dim ObjIntDtl2 As New IntegrationDetail
+   Dim ObjIntCol2 As New IntegrationColumn: Dim objResult2 As RaisedVoucherResult
+   
+   Dim varItemID  As Variant, varRate  As Variant, varQuantity As Variant
+   Dim varAmount  As Variant
+   
+   Dim i          As Integer
+   
+   If infDistShop.Caption <> "Y" Then
+      With fpgTransaction
+   
+         For i = 1 To .MaxRows
+   
+            .GetText 1, i, varItemID
+            .GetText 4, i, varQuantity
+            .GetText 7, i, varRate
+            .GetText 13, i, varAmount
+            
+            '''" & cboWarehouse.ItemData(cboWarehouse.ListIndex) & "
+            pDBConnection.Execute ("INSERT INTO tblInvStockLedgerStkLoc(CompanyID, FG_ID, StockLocationID, DocumentType, DocumentSubType, " & _
+                                   "DocumentNo, DocumentDate, CustomerID, QtyReceipt, QtyIssue, PricePerUnit, Amount) VALUES(" & _
+                                   Val(gstrOrgID) & ", " & varItemID & ", 3, '010', 'FG', '" & Right("00000" & mebSalesEntryID.text, 6) & "', " & _
+                                   "'" & Format(mebSalesEntryDate.text, gstrdbDateFormat) & "', '" & mebCustomerCode.text & "', 0, " & _
+                                   Val(varQuantity) & ", " & Val(varRate) & ", " & Val(Format(varAmount, "####0.00")) & ")")
+            
+         Next i
+   
+      End With
+   End If
+      
+   'SALES INVOICE VOUCHER
+   If infDistShop.Caption <> "Y" Then
+      If mebCustomerCode.text = "99001" Then
+         ObjIntCol2.AccountID = "5.03.01.17.002"
+      Else
+         ObjIntCol2.AccountID = gSysDefMiscCustomersMainAccID
+      End If
+      ObjIntCol2.Amount = Val(Format(infNetValue.Caption, "####0.00"))
+      ObjIntCol2.TransactionType = "DR"
+      ObjIntCol2.AccountHeadNarration = UCase(infCustomerName.Caption)
+      ObjIntDtl2.Add ObjIntCol2
+      
+      ObjIntCol2.AccountID = "2.02.04.02.001"
+      ObjIntCol2.Amount = Val(Format(infVATValue.Caption, "####0.00"))
+      ObjIntCol2.TransactionType = "CR"
+      ObjIntCol2.AccountHeadNarration = UCase(infCustomerName.Caption)
+      ObjIntDtl2.Add ObjIntCol2
+      
+      ObjIntCol2.AccountID = gSysDefSalesAccID
+      ObjIntCol2.Amount = Val(Format(infExcSEDnSTValue.Caption, "####0.00"))
+      ObjIntCol2.TransactionType = "CR"
+      ObjIntCol2.AccountHeadNarration = UCase(infCustomerName.Caption)
+      ObjIntDtl2.Add ObjIntCol2
+      
+      ObjInt2.DcoumentType = "SI"
+      ObjInt2.DocumentNo = pstrRecordType & " - " & Right("00000" & pintRecordID, 6)
+      ObjInt2.DocumentDate = Format(mebSalesEntryDate.text, gstrdbDateFormat)
+      ObjInt2.Narration = UCase("BG - " & Right("00000" & mebSalesEntryID.text, 6) & " - " & infCustomerName.Caption)
+      Set ObjInt2.Detail = ObjIntDtl2
+   
+      objResult2 = RaiseVoucher(pDBConnection, ObjInt2, Val(gstrOrgID), "HO")
+   End If
+   '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+   pDBConnection.Execute ("UPDATE " & mstrSalesTableName & " SET Authorized = '1', AuthorizedBy = '" & gstrUser & "', " & _
+                          "AuthorizedDate = getDate() WHERE CompanyID = " & Val(gstrOrgID) & " AND " & _
+                          "FinYear = '" & gstrFinancialYear & "' AND BillType = 'SI' AND " & _
+                          "SalesEntryType = 'BG' AND SalesEntryID = " & mebSalesEntryID.text)
+                          
+   If infDistShop.Caption <> "Y" Then
+      If objResult2.IsVoucherRaised = True Then
+         pDBConnection.Execute ("UPDATE " & mstrSalesTableName & " SET " & _
+                                "Station1 = '" & objResult2.Station & "', " & _
+                                "VouType1 = '" & objResult2.VoucherType & "', " & _
+                                "VouNo1 = '" & objResult2.VoucherNo & "' WHERE CompanyID = " & Val(gstrOrgID) & " AND " & _
+                                "FinYear = '" & gstrFinancialYear & "' AND BillType = 'SI' AND " & _
+                                "SalesEntryType = 'BG' AND SalesEntryID = " & mebSalesEntryID.text)
+      End If
+   End If
+End Sub
+
+Private Function NEW_GetNewSalesEntryID_Typewise(pstrType As String) As Integer
+   Dim strTemp As String
+   
+   Dim rsTemp  As New ADODB.Recordset
+     
+   strTemp = "SELECT MAX(SalesEntryID) AS MaxSalesEntryID FROM " & mstrSalesTableName & " WHERE " & _
+             "CompanyID = " & Val(gstrOrgID) & " AND FinYear = '" & gstrFinancialYear & "' AND " & _
+             "SalesEntryType = '" & pstrType & "' AND BillType = 'SI'"
+                
+   rsTemp.Open strTemp, AppCnn, adOpenKeyset
+
+   If IsNull(rsTemp("MaxSalesEntryID")) = True Then
+       NEW_GetNewSalesEntryID_Typewise = 1
+   Else
+      
+       NEW_GetNewSalesEntryID_Typewise = Val(rsTemp.Fields("MaxSalesEntryID").Value) + 1
+   End If
+   
+   rsTemp.Close
+   Set rsTemp = Nothing
+End Function
+
+Private Sub mebSalesEntryID_GotFocus()
+   Call SelectText(mebSalesEntryID)
+End Sub
+
+Private Function CheckEntryDate(pDateObject As Control, pstrType As String) As Boolean
+   Dim rsTemp  As New ADODB.Recordset
+   
+   CheckEntryDate = False
+     
+   rsTemp.Open "SELECT MAX(SalesEntryDate) AS MaxDate FROM " & mstrSalesTableName & " WHERE " & _
+               "CompanyID = " & Val(gstrOrgID) & " AND FinYear = '" & gstrFinancialYear & "' AND " & _
+               "SalesEntryType = '" & pstrType & "' AND BillType = 'SI'", AppCnn, adOpenStatic, adLockReadOnly
+   
+   If rsTemp.RecordCount > 0 Then
+      
+      If IsNull(rsTemp.Fields("MaxDate").Value) = False Then
+         If CDate(Format(pDateObject.text, gstrDateFormat)) < _
+            CDate(Format(rsTemp.Fields("MaxDate").Value, gstrDateFormat)) Then
+   
+            MsgBox "Sales Invoice(s) have already been entered after this date.", vbExclamation + vbOKOnly, App.ProductName
+            pDateObject.SetFocus
+            Exit Function
+               
+         End If
+      End If
+      
+   End If
+
+   CheckEntryDate = True
+
+   rsTemp.Close
+   Set rsTemp = Nothing
+End Function
+
+Private Sub GridRowCalculations(plngRowNo As Long, Optional pdblSTPercentage As Double, Optional pdblSEDPercentage As Double)
+   Dim varFG_ID                  As Variant
+   Dim varNoOfPacks              As Variant, varWeight            As Variant, varBasicRate      As Variant
+   Dim varSpecialDiscount        As Variant, varExcSEDnSTRate     As Variant, varIncSEDnSTValue As Variant
+   Dim varSTRate                 As Variant, varSTAmount          As Variant, varExcSEDnSTValue As Variant
+   Dim varEmptyCartons           As Variant, varNoOfUnitsInPack   As Variant, varUnitWeight     As Variant
+   Dim varEmptyCartonPercentage  As Variant, varSEDRate           As Variant, varSEDAmount      As Variant
+   
+   Dim varSTAmount_Reg           As Variant
+   Dim varSTAmount_Ext           As Variant
+   
+   Dim varDisc1_Percentage       As Variant
+   Dim varDisc1_Percentage_Value As Variant
+   Dim varDisc2_PerPack          As Variant
+   Dim varDisc2_PerPack_Value    As Variant
+   
+   Dim varNetRate                As Variant
+   
+   Dim varNetRate1               As Variant
+   Dim varNetRate2               As Variant
+   
+   Dim varIncSEDValue            As Variant
+   Dim varIncSTValue             As Variant
+   
+   'FG CODE
+   fpgTransaction.GetText 1, plngRowNo, varFG_ID
+   
+   'NO. OF PACKS
+   fpgTransaction.GetText 4, plngRowNo, varNoOfPacks
+   
+   'BASIC RATE AND SPECIAL DISC.
+   fpgTransaction.GetText 7, plngRowNo, varBasicRate
+   fpgTransaction.GetText 8, plngRowNo, varSpecialDiscount
+   
+   'S.E.D RATE
+   fpgTransaction.GetText 25, plngRowNo, varSEDRate
+   
+   If pdblSTPercentage <> 0 Then
+      fpgTransaction.SetText 11, plngRowNo, pdblSTPercentage
+      
+      varSTRate = pdblSTPercentage
+      
+   Else
+      'S.T RATE
+      fpgTransaction.GetText 11, plngRowNo, varSTRate
+      
+   End If
+         
+   If pdblSEDPercentage <> 0 Then
+      fpgTransaction.SetText 25, plngRowNo, pdblSEDPercentage
+      
+      varSEDRate = pdblSEDPercentage
+      
+   Else
+      'S.E.D RATE
+      fpgTransaction.GetText 25, plngRowNo, varSEDRate
+      
+   End If
+      
+   'DISCOUNT 2 - PER PACK
+   fpgTransaction.GetText 29, plngRowNo, varDisc2_PerPack
+   
+   'UNIT WEIGHT AND NO. OF UNITS IN PACK
+   fpgTransaction.GetText 16, plngRowNo, varNoOfUnitsInPack
+   fpgTransaction.GetText 17, plngRowNo, varUnitWeight
+   
+   'WEIGHT
+   Dim dblWeight As Double
+   dblWeight = Val(varNoOfUnitsInPack) * Val(varUnitWeight) * Val(varNoOfPacks)
+   fpgTransaction.SetText 5, plngRowNo, Val(dblWeight)
+   
+   'EXC. S.E.D AND S.T RATE
+   If Val(varSTRate) > 0 Then
+      fpgTransaction.SetText 9, plngRowNo, _
+                                Format(Val(varBasicRate) - Val(Format((Val(varSpecialDiscount) / (1 + Val(varSTRate) / 100)), _
+                                "####0.000")), "##,##0.000")
+   Else
+      fpgTransaction.SetText 9, plngRowNo, Format(Val(varBasicRate) - _
+                                                  Val(Format((Val(varSpecialDiscount)), "####0.000")), "##,##0.000")
+   End If
+   fpgTransaction.GetText 9, plngRowNo, varExcSEDnSTRate
+   varExcSEDnSTRate = Format(varExcSEDnSTRate, "####0.000")
+   
+   'EXC. S.E.D AND S.T VALUE
+   fpgTransaction.SetText 13, plngRowNo, Format(Val(varNoOfPacks) * Val(varExcSEDnSTRate), "##,##0.00")
+   fpgTransaction.GetText 13, plngRowNo, varExcSEDnSTValue
+   
+   'NET RATE
+   fpgTransaction.SetText 14, plngRowNo, Val(varExcSEDnSTRate) + _
+                                         Val(Format(Val(varExcSEDnSTRate) * (Val(varSEDRate) / 100), "####0.000")) + _
+                                         Val(Format(Val(varExcSEDnSTRate) * (Val(varSTRate) / 100), "####0.000"))
+   fpgTransaction.GetText 14, plngRowNo, varNetRate
+   
+   varNetRate1 = Val(varExcSEDnSTRate) + Val(Format(Val(varExcSEDnSTRate) * (Val(varSEDRate) / 100), "####0.000"))
+   varNetRate2 = Val(varExcSEDnSTRate) + Val(Format(Val(varExcSEDnSTRate) * (Val(varSTRate) / 100), "####0.000"))
+      
+   varIncSEDValue = Format(Val(varNoOfPacks) * Val(Format(varNetRate1, "####0.000")), "##,##0.00")
+   varIncSTValue = Format(Val(varNoOfPacks) * Val(Format(varNetRate2, "####0.000")), "##,##0.00")
+   
+   'INC. S.E.D AND S.T VALUE
+   fpgTransaction.SetText 10, plngRowNo, Format(Val(varNoOfPacks) * Val(Format(varNetRate, "####0.000")), "##,##0.00")
+   fpgTransaction.GetText 10, plngRowNo, varIncSEDnSTValue
+   
+   If Val(varSEDRate) > 0 Then
+      varSEDAmount = Format(Val(Format(varIncSEDValue, "####0.00")) - Val(Format(varExcSEDnSTValue, "####0.00")), "##,##0.00")
+   
+      'S.E.D VALUE
+      fpgTransaction.SetText 26, plngRowNo, varSEDAmount
+      
+   Else
+      'S.E.D VALUE
+      fpgTransaction.SetText 26, plngRowNo, 0
+   
+   End If
+   
+   varSTAmount_Reg = 0#
+   varSTAmount_Ext = 0#
+   
+   fpgTransaction.SetText 32, plngRowNo, 0#
+   fpgTransaction.SetText 33, plngRowNo, 0#
+   
+   If Val(varSTRate) > 0 Then
+      varSTAmount = Format(Val(Format(varIncSTValue, "####0.00")) - Val(Format(varExcSEDnSTValue, "####0.00")), "##,##0.00")
+   
+      'S.T VALUE
+      fpgTransaction.SetText 12, plngRowNo, varSTAmount
+      
+      'CALCULATION OF EXTRA S.TAX
+      If pdblSTPercentage = 20 Or pdblSTPercentage = 21 Or pdblSTPercentage = 22 Then
+      
+         If pdblSTPercentage = 20 Then
+            varSTAmount_Reg = Val(Format((varSTAmount / pdblSTPercentage) * 17, "####0.00"))
+            varSTAmount_Ext = varSTAmount - varSTAmount_Reg
+         Else
+            varSTAmount_Reg = Val(Format((varSTAmount / pdblSTPercentage) * 18, "####0.00"))
+            varSTAmount_Ext = varSTAmount - varSTAmount_Reg
+         End If
+         
+         fpgTransaction.SetText 32, plngRowNo, Format(varSTAmount_Reg, "##,##0.00")
+         fpgTransaction.SetText 33, plngRowNo, Format(varSTAmount_Ext, "##,##0.00")
+         
+      Else
+      
+         fpgTransaction.SetText 32, plngRowNo, varSTAmount
+      
+      End If
+      
+   Else
+      'S.T VALUE
+      fpgTransaction.SetText 12, plngRowNo, 0
+      
+   End If
+   
+   'SET THE INC. S.E.D AND S.T VALUE AGAIN
+   fpgTransaction.SetText 10, plngRowNo, Format(Val(Format(varExcSEDnSTValue, "####0.00")) + _
+                                                Val(Format(varSTAmount, "####0.00")) + _
+                                                Val(Format(varSEDAmount, "####0.00")), "##,##0.00")
+   
+   'DISCOUNT 1 - PERCENTAGE
+   fpgTransaction.GetText 27, plngRowNo, varDisc1_Percentage
+   fpgTransaction.SetText 28, plngRowNo, Format(varExcSEDnSTValue * Val(varDisc1_Percentage) / 100, "##,##0.00")
+   
+   'DISCOUNT 2 - PER PACK
+   fpgTransaction.GetText 29, plngRowNo, varDisc2_PerPack
+   fpgTransaction.SetText 30, plngRowNo, Format(varNoOfPacks * Val(varDisc2_PerPack), "##,##0.00")
+   
+   'EMPTY CARTONS
+   fpgTransaction.GetText 19, plngRowNo, varEmptyCartonPercentage
+   fpgTransaction.SetText 15, plngRowNo, Format(Val(varNoOfPacks) * (Val(varEmptyCartonPercentage) / 100), "##,##0")
+End Sub
+
+Private Sub PrintCommercialInvoice(prptCommInvReport As arSalInvCommercialInvoice, pstrOCCopy As String, _
+                                   pblnSendToPrinter As Boolean, pblnHideCoName As Boolean, Optional pblnIsExport As Boolean)
+   Dim rsTemp As New ADODB.Recordset
+   
+   Dim strTotalPacks As String
+   
+   strTotalPacks = ", (SELECT SUM(NoOfPacks) FROM " & mstrSalesTableName & "Detail SEDtl WHERE SEDtl.CompanyID = " & Val(gstrOrgID) & " AND " & _
+                      "SEDtl.FinYear = SE.FinYear AND SEDtl.SalesEntryType = SE.SalesEntryType AND SEDtl.SalesEntryID =  SE.SalesEntryID) AS TotalPacks"
+
+   rsTemp.Open "SELECT SE.FinYear, SE.SalesEntryType, SE.SalesEntryID, SalesEntryDate, SE.CustomerID, CustomerCoName, Address, FG.Brand_ID, " & _
+               "Brand_Title, SE_Dtl.FG_ID, FGName, NoOfPacks, NetRate, IncSTValue, TotalIncSTValue, NetAmount, TotalWeightInTons, VehicleRegNo, " & _
+               "TotalDiscount1_Percentage_Value, TotalDiscount2_PerPack_Value, TotalCommission, SE.IncomeTaxPercentage, IncomeTax, " & _
+               "IncomeTaxIncValue, (TotalDiscount1_Percentage_Value + TotalDiscount2_PerPack_Value) AS TotalDiscount, TotalExcSTValue, " & _
+               "BasicRate, ExcSTValue, VATValue " & _
+               strTotalPacks & " FROM " & mstrSalesTableName & " SE INNER JOIN " & mstrSalesTableName & "Detail SE_Dtl ON SE.CompanyID = " & _
+               "SE_Dtl.CompanyID AND SE.FinYear = SE_Dtl.FinYear AND SE.SalesEntryType = SE_Dtl.SalesEntryType AND SE.SalesEntryID = " & _
+               "SE_Dtl.SalesEntryID AND SE.BillType = SE_Dtl.BillType INNER JOIN tblSalCustomerInfo Cust ON SE.CompanyID = Cust.CompanyID AND " & _
+               "SE.CustomerID = Cust.CustomerID INNER JOIN tblInvItemFG FG ON SE_Dtl.CompanyID = FG.CompanyID AND SE_Dtl.FG_ID = FG.FG_ID " & _
+               "INNER JOIN tblInvItemFGBrand FGBrand ON FG.Brand_ID = FGBrand.Brand_ID WHERE SE.CompanyID = " & Val(gstrOrgID) & " AND " & _
+               "SE.FinYear = '" & gstrFinancialYear & "' AND SE.BillType = 'SI' AND SE.SalesEntryType = 'BG' AND " & _
+               "SE.SalesEntryID = " & mebSalesEntryID.text & " ORDER BY SE.SalesEntryType, SE.SalesEntryID, Brand_Title, SE_Dtl.FG_ID", _
+               AppCnn, adOpenKeyset, adLockReadOnly
+
+   If rsTemp.BOF = True And rsTemp.EOF = True Then
+      MsgBox "Commercial Invoice - " & pstrOCCopy & " cannot be printed.", vbExclamation + vbOKOnly, App.ProductName
+      Exit Sub
+   End If
+
+   With prptCommInvReport
+
+      .dc.Recordset = rsTemp
+
+      .Toolbar.Tools(2).Visible = mUserPriv.CanPrint
+
+      If mUserPriv.CanExport = True Then
+         .Toolbar.Tools.Add "Export"
+         .Toolbar.Tools.Item(.Toolbar.Tools.Count - 1).ID = 786
+         .Toolbar.Tools.Item(.Toolbar.Tools.Count - 1).Type = 0
+      End If
+
+      .dc.ConnectionString = AppCnn.ConnectionString
+      .dc.UserID = gstrdbUser
+      .dc.Password = gstrdbUserPassword
+      
+      If pblnHideCoName = True Then
+         .lblOrgName.Visible = False
+      End If
+      
+      .Caption = "Sales Invoice"
+      
+      .GroupHeader1.DataField = "SalesEntryID"
+      
+      .GroupHeader2.DataField = "Brand_Title"
+      .fldBrandName1.DataField = "Brand_Title"
+      .fldBrandName2.DataField = "Brand_Title"
+
+      .fldInvoiceType.DataField = "SalesEntryType"
+      .fldInvoiceNo.DataField = "SalesEntryID"
+      .fldInvoiceDate.DataField = "SalesEntryDate"
+      .fldCustomerCode.DataField = "CustomerID"
+      .fldCustomerName.DataField = "CustomerCoName"
+      .fldAddress.DataField = "Address"
+
+      .fldFG_ID.DataField = "FG_ID"
+      .fldProduct.DataField = "FGName"
+      
+      .fldNoOfPacks.DataField = "NoOfPacks"
+      .fldPrice.DataField = "BasicRate"
+      .fldExcValue.DataField = "ExcSTValue"
+      .fldVAT.DataField = "VATValue"
+      .fldNetPrice.DataField = "NetRate"
+      .fldIncValue.DataField = "IncSTValue"
+
+      .fldGrandTotalIncValue.DataField = "TotalIncSTValue"
+      
+      .fldTotalPacks.DataField = "TotalPacks"
+      
+      .GroupFooter1.Height = 2520
+      
+      Dim strSIDate As String
+      
+      strSIDate = rsTemp.Fields("SalesEntryDate").Value
+      
+      If pblnIsExport = True Then
+         .Run
+         
+         Call ExportReport("PDF", "BG-" & Right("0000" & mebSalesEntryID.text, 5) & "-" & Replace(strSIDate, "/", "."), prptCommInvReport)
+                           
+         Call Unload(prptCommInvReport)
+      
+      Else
+         If pblnSendToPrinter = False Then
+            .Show
+            
+         Else
+            .PrintReport False
+            Unload prptCommInvReport
+            
+         End If
+         
+      End If
+      
+   End With
+End Sub
+
+Private Sub UnPostSalesInvoice(pDBConnection As ADODB.Connection, pstrRecordType As String, pintRecordID As Integer)
+   Dim i          As Integer
+   
+   Dim varItemID  As Variant
+   
+   If infDistShop.Caption <> "Y" Then
+      With fpgTransaction
+      
+         For i = 1 To .MaxRows
+   
+            .GetText 1, i, varItemID
+            
+            '''" & cboWarehouse.ItemData(cboWarehouse.ListIndex) & "
+            pDBConnection.Execute "DELETE FROM tblInvStockLedgerStkLoc WHERE CompanyID = " & Val(gstrOrgID) & " AND FG_ID = " & varItemID & " AND " & _
+                                  "StockLocationID = 3 AND DocumentType = '010' AND DocumentSubType = 'FG' AND " & _
+                                  "DocumentNo = '" & Right("00000" & mebSalesEntryID.text, 6) & "' AND " & _
+                                  "DocumentDate = '" & Format(mebSalesEntryDate.text, gstrdbDateFormat) & "'"
+                                   
+         Next i
+         
+      End With
+   End If
+   
+   pDBConnection.Execute ("UPDATE " & mstrSalesTableName & " SET Checked = '0', CheckedBy = 'N/A', CheckedDate = NULL, " & _
+                          "Authorized = '0', AuthorizedBy = 'N/A', AuthorizedDate = NULL WHERE " & _
+                          "CompanyID = " & Val(gstrOrgID) & " AND FinYear = '" & gstrFinancialYear & "' AND " & _
+                          "BillType = 'SI' AND SalesEntryType = '" & pstrRecordType & "' AND " & _
+                          "SalesEntryID = " & pintRecordID)
+                          
+   Dim tmprs As New ADODB.Recordset
+   
+   If infDistShop.Caption <> "Y" Then
+      tmprs.Open "SELECT * FROM " & mstrSalesTableName & " WHERE CompanyID = " & Val(gstrOrgID) & " AND " & _
+                 "FinYear = '" & gstrFinancialYear & "' AND BillType = 'SI' AND " & _
+                 "SalesEntryType = '" & pstrRecordType & "' AND SalesEntryID = " & pintRecordID, _
+                 pDBConnection, adOpenStatic, adLockReadOnly
+                 
+      pDBConnection.Execute ("UPDATE " & mstrSalesTableName & " SET " & _
+                             "Station = NULL, VouType = NULL, VouNo = NULL, " & _
+                             "Station1 = NULL, VouType1 = NULL, VouNo1 = NULL WHERE " & _
+                             "CompanyID = " & Val(gstrOrgID) & " AND FinYear = '" & gstrFinancialYear & "' AND " & _
+                             "BillType = 'SI' AND SalesEntryType = '" & pstrRecordType & "' AND " & _
+                             "SalesEntryID = " & pintRecordID)
+                      
+      If tmprs.RecordCount > 0 Then
+         tmprs.MoveFirst
+         
+         If IsNull(tmprs.Fields("Station").Value) = False Then
+            pDBConnection.Execute "Delete_tblAccVoucherDetail " & Val(gstrOrgID) & ", '" & tmprs.Fields("Station").Value & "', " & _
+                                  "'" & tmprs.Fields("VouType").Value & "', '" & tmprs.Fields("VouNo").Value & "'"
+         
+            pDBConnection.Execute "Delete_tblAccVoucher " & Val(gstrOrgID) & ", '" & tmprs.Fields("Station").Value & "', " & _
+                                  "'" & tmprs.Fields("VouType").Value & "', '" & tmprs.Fields("VouNo").Value & "'"
+         End If
+         
+         If IsNull(tmprs.Fields("Station1").Value) = False Then
+            pDBConnection.Execute "Delete_tblAccVoucherDetail " & Val(gstrOrgID) & ", '" & tmprs.Fields("Station1").Value & "', " & _
+                                  "'" & tmprs.Fields("VouType1").Value & "', '" & tmprs.Fields("VouNo1").Value & "'"
+         
+            pDBConnection.Execute "Delete_tblAccVoucher " & Val(gstrOrgID) & ", '" & tmprs.Fields("Station1").Value & "', " & _
+                                  "'" & tmprs.Fields("VouType1").Value & "', '" & tmprs.Fields("VouNo1").Value & "'"
+         End If
+   
+      End If
+      
+      tmprs.Close
+      Set tmprs = Nothing
+      
+   End If
+End Sub
+
+Private Sub UnCheckSalesInvoice(pDBConnection As ADODB.Connection, pstrRecordType As String, pintRecordID As Integer)
+   pDBConnection.Execute ("UPDATE " & mstrSalesTableName & " SET Checked = '0', CheckedBy = 'N/A', CheckedDate = NULL " & _
+                          "WHERE CompanyID = " & Val(gstrOrgID) & " AND FinYear = '" & gstrFinancialYear & "' AND BillType = 'SI' AND " & _
+                          "SalesEntryType = '" & pstrRecordType & "' AND SalesEntryID = " & pintRecordID)
+End Sub
+
+Private Sub txtDeliveredTo_GotFocus()
+   Call SelectText(txtDeliveredTo)
+End Sub
+
+Private Sub txtDeliveredTo_KeyPress(KeyAscii As Integer)
+   Call SingleQouteKeyCheck(KeyAscii)
+End Sub
+
+Private Sub txtVehRegNo_GotFocus()
+   Call SelectText(txtVehRegNo)
+End Sub
+
+Private Sub txtVehRegNo_KeyPress(KeyAscii As Integer)
+   Call SingleQouteKeyCheck(KeyAscii)
+End Sub
+</user_query>

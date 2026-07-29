@@ -221,16 +221,24 @@ public class DeleteSalesInvoiceCommandHandler : IRequestHandler<DeleteSalesInvoi
             throw new DomainException("Posted sales invoice cannot be deleted.");
         }
 
+        // Delete detail rows first (FK_tblSalSalesEntryDetail_tblSalSalesEntry).
+        // Must SaveChanges before removing header — EF has no configured cascade
+        // relationship, so a single batch can delete the parent first and fail.
         var lines = await _context.SalSalesEntryDetails
             .Where(d =>
-                d.CompanyId == request.CompanyId
-                && d.FinYear == request.FinYear
-                && d.BillType == "SI"
-                && d.SalesEntryType == "BG"
-                && d.SalesEntryId == request.SalesEntryId)
+                d.CompanyId == header.CompanyId
+                && d.FinYear == header.FinYear
+                && d.BillType == header.BillType
+                && d.SalesEntryType == header.SalesEntryType
+                && d.SalesEntryId == header.SalesEntryId)
             .ToListAsync(cancellationToken);
 
-        _context.SalSalesEntryDetails.RemoveRange(lines);
+        if (lines.Count > 0)
+        {
+            _context.SalSalesEntryDetails.RemoveRange(lines);
+            await _context.SaveChangesAsync(cancellationToken);
+        }
+
         _context.SalSalesEntries.Remove(header);
         await _context.SaveChangesAsync(cancellationToken);
     }
