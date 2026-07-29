@@ -1,0 +1,137 @@
+<!-- Screen-only toolbar (hidden in print) -->
+<div class="inv-toolbar no-print" *ngIf="invoice && !loading && !error">
+  <button type="button" class="inv-toolbar__btn" (click)="print()">Print</button>
+</div>
+
+<div class="inv-status no-print" *ngIf="loading">Loading invoice…</div>
+<div class="inv-status inv-status--err no-print" *ngIf="error">{{ error }}</div>
+
+<!-- One A4 sheet per page (VB multi-page) -->
+<section
+  class="inv-sheet"
+  *ngFor="let page of pages; let last = last"
+  [class.inv-sheet--last]="last"
+>
+  <!-- HEADER: outer frame; left rule stops at title; no line under SALES INVOICE -->
+  <header class="inv-hdr">
+    <div class="inv-hdr__left">
+      <div class="inv-hdr__name">{{ company.name }}</div>
+      <div class="inv-hdr__addr">
+        <div>{{ company.addressLine1 }}</div>
+        <div>{{ company.addressLine2 }}</div>
+      </div>
+    </div>
+    <div class="inv-hdr__title">SALES INVOICE</div>
+  </header>
+
+  <!-- BUYER / INVOICE META -->
+  <div class="inv-meta">
+    <div class="inv-meta__left">
+      <div class="inv-field">
+        <span class="inv-field__label">BUYER'S CODE :</span>
+        <span class="inv-field__value">{{ buyerCode }}</span>
+      </div>
+      <div class="inv-field">
+        <span class="inv-field__label">BUYER'S NAME :</span>
+        <span class="inv-field__value">{{ buyerName }}</span>
+      </div>
+      <div class="inv-field">
+        <span class="inv-field__label">ADDRESS :</span>
+        <span class="inv-field__value">{{ buyerAddress }}</span>
+      </div>
+    </div>
+    <div class="inv-meta__right">
+      <div class="inv-field">
+        <span class="inv-field__label">INVOICE NO. :</span>
+        <span class="inv-field__value">{{ invoiceNo }}</span>
+      </div>
+      <div class="inv-field">
+        <span class="inv-field__label">INVOICE DATE :</span>
+        <span class="inv-field__value">{{ invoiceDate }}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- PRODUCT TABLE -->
+  <table class="inv-grid">
+    <colgroup>
+      <col class="col-code" />
+      <col class="col-desc" />
+      <col class="col-packs" />
+      <col class="col-price" />
+      <col class="col-value" />
+      <col class="col-vat" />
+      <col class="col-nprice" />
+      <col class="col-nvalue" />
+    </colgroup>
+    <thead>
+      <tr>
+        <th>PROD. CODE</th>
+        <th>DESCRIPTION</th>
+        <th>PACKS</th>
+        <th>PRICE (£)</th>
+        <th>VALUE (£)</th>
+        <th>{{ vatHeader }}</th>
+        <th>NET PRICE (£)</th>
+        <th>NET VALUE (£)</th>
+      </tr>
+    </thead>
+    <tbody>
+      <ng-container *ngFor="let row of page.rows">
+        <tr class="inv-brand" *ngIf="row.kind === 'brand'">
+          <td></td>
+          <td colspan="7"><u>{{ row.brand }}</u></td>
+        </tr>
+        <tr class="inv-item" *ngIf="row.kind === 'item'">
+          <td class="is-code">{{ row.line.fgId }}</td>
+          <td class="is-desc">{{ row.line.fgName }}</td>
+          <td class="is-packs">{{ row.line.noOfPacks }}</td>
+          <td class="is-num">{{ formatPrice(row.line.basicRate) }}</td>
+          <td class="is-num">{{ formatMoney(row.line.excStValue) }}</td>
+          <td class="is-num">{{ formatVat(row.line.vatValue) }}</td>
+          <td class="is-num">{{ formatPrice(row.line.netRate) }}</td>
+          <td class="is-num">{{ formatMoney(row.line.incStValue) }}</td>
+        </tr>
+      </ng-container>
+    </tbody>
+  </table>
+
+  <!-- TOTALS (last page only) -->
+  <div class="inv-totals" *ngIf="page.showTotals">
+    <div class="inv-totals__packs">
+      <span class="inv-totals__packs-label">TOTAL PACKS :</span>
+      <span class="inv-totals__packs-value">{{ totalPacks }}</span>
+    </div>
+    <div class="inv-totals__money">
+      <div class="inv-totals__row">
+        <span class="inv-totals__lbl">SUB TOTAL :</span>
+        <span class="inv-totals__sub">{{ formatMoney(subTotal) }}</span>
+      </div>
+      <div class="inv-totals__row inv-totals__row--grand">
+        <span class="inv-totals__lbl">GRAND TOTAL :</span>
+        <span class="inv-totals__grand">{{ formatMoney(grandTotal) }}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER pinned to bottom of A4 sheet -->
+  <footer class="inv-footer">
+    <div class="inv-footer__signs">
+      <div class="inv-footer__sign">
+        <div class="inv-footer__sign-line"></div>
+        <div class="inv-footer__sign-lbl">[ CHECKED BY ]</div>
+      </div>
+      <div class="inv-footer__note">This invoice is computer generated.</div>
+      <div class="inv-footer__sign">
+        <div class="inv-footer__sign-line"></div>
+        <div class="inv-footer__sign-lbl">[ AUTHORIZED SIGNATURE ]</div>
+      </div>
+    </div>
+    <div class="inv-footer__rule" aria-hidden="true"></div>
+    <div class="inv-footer__meta">
+      <span class="inv-footer__meta-left">Page : {{ page.pageNo }} / {{ pages.length }}</span>
+      <span class="inv-footer__meta-center">{{ printedAtLabel }}</span>
+      <span class="inv-footer__meta-right">Printed By : {{ printedBy }}</span>
+    </div>
+  </footer>
+</section>

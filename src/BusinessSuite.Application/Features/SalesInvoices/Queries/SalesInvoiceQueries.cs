@@ -69,7 +69,9 @@ public class SearchSalesInvoicesQueryHandler
                   && se.FinYear == request.FinYear
                   && se.BillType == "SI"
                   && se.SalesEntryType == "BG"
-                  && se.Is19LtrInvoice == "N"
+                  && (se.Is19LtrInvoice == "N"
+                      || se.Is19LtrInvoice == null
+                      || se.Is19LtrInvoice == "")
             select new { se, cust };
 
         if (request.PeriodStart.HasValue)
@@ -145,8 +147,8 @@ public class SearchSalesInvoicesQueryHandler
         }
 
         return await query
-            .OrderBy(x => x.se.SalesEntryDate)
-            .ThenBy(x => x.se.SalesEntryId)
+            .OrderByDescending(x => x.se.SalesEntryDate)
+            .ThenByDescending(x => x.se.SalesEntryId)
             .Take(take)
             .Select(x => new SalesInvoiceListItemDto(
                 x.se.SalesEntryType,

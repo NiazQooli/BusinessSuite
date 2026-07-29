@@ -10,6 +10,15 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./features/auth/login/login').then((m) => m.LoginComponent),
   },
+  /* Printable A4 invoice — outside shell (no sidebar / navbar) */
+  {
+    path: 'print/invoice/:id',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./features/invoice-print/invoice-print.component').then(
+        (m) => m.InvoicePrintComponent,
+      ),
+  },
   {
     path: '',
     component: ShellComponent,

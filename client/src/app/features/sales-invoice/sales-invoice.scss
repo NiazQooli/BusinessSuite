@@ -1,4 +1,4 @@
-:host {
+﻿:host {
   display: flex;
   flex: 1 1 auto;
   min-height: 0;
@@ -683,6 +683,13 @@
   color: var(--fresher-orange);
 }
 
+.si-find__fy {
+  margin: 0.2rem 0 0;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--fe-form-text-muted);
+}
+
 .si-find__filters {
   display: grid;
   grid-template-columns: minmax(8rem, 1fr) 2fr minmax(8.5rem, 1fr);
@@ -899,3 +906,4 @@
     grid-template-columns: 1fr;
   }
 }
+

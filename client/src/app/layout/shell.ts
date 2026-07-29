@@ -55,6 +55,11 @@ export class ShellComponent implements OnInit {
   /** Temporary options until dedicated accounting-period API is wired. */
   financialYearOptions = [
     {
+      value: '2027-28',
+      label: '2027-28 (01/07/2027 - 30/06/2028)',
+      period: 'Full Financial Year (01 Jul 2027 – 30 Jun 2028)',
+    },
+    {
       value: '2026-27',
       label: '2026-27 (01/07/2026 - 30/06/2027)',
       period: 'Full Financial Year (01 Jul 2026 – 30 Jun 2027)',

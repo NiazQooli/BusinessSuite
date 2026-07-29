@@ -84,6 +84,29 @@ body {
   font-family: var(--fresher-font);
 }
 
+/* A4 invoice print route — no app chrome, scrollable sheets */
+body.invoice-print-body {
+  height: auto !important;
+  max-height: none !important;
+  overflow: auto !important;
+  background: #d0d0d0 !important;
+  color: #000 !important;
+  font-family: Arial, Helvetica, sans-serif !important;
+}
+
+body.invoice-print-body app-root {
+  display: block;
+  height: auto;
+  max-height: none;
+  overflow: visible;
+}
+
+@media print {
+  body.invoice-print-body {
+    background: #fff !important;
+  }
+}
+
 button,
 input {
   font: inherit;

@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+﻿import { CommonModule } from '@angular/common';
 import {
   ChangeDetectorRef,
   Component,
@@ -27,6 +27,8 @@ import { PrivilegeService } from '../../core/services/privilege.service';
 import { UserPrivilege } from '../../core/models/privilege.model';
 import { ToastService } from '../../core/services/toast.service';
 import { ConfirmDialogService } from '../../core/services/confirm-dialog.service';
+import { AuthService } from '../../core/services/auth.service';
+import { writeInvoicePrintCache } from '../../core/services/invoice-print-cache';
 import { FeIconComponent } from '../../shared/icon/fe-icon';
 
 const PERIOD_STORAGE_KEY = 'fresher.accountingPeriod';
@@ -49,6 +51,7 @@ export class SalesInvoiceComponent implements OnInit, OnDestroy {
   private readonly privilegesApi = inject(PrivilegeService);
   private readonly toast = inject(ToastService);
   private readonly confirmDialog = inject(ConfirmDialogService);
+  private readonly auth = inject(AuthService);
   private readonly host = inject(ElementRef<HTMLElement>);
   private readonly cdr = inject(ChangeDetectorRef);
   private readonly injector = inject(Injector);
@@ -74,6 +77,7 @@ export class SalesInvoiceComponent implements OnInit, OnDestroy {
   readonly loading = signal(false);
 
   finYear = '';
+  salesEntryType = 'BG';
   salesEntryId: number | null = null;
   salesEntryDate = '';
   vehicleRegNo = '';
@@ -139,7 +143,9 @@ export class SalesInvoiceComponent implements OnInit, OnDestroy {
     this.loading.set(true);
     this.api.getContext().subscribe({
       next: (ctx) => {
-        this.finYear = ctx.finYear;
+        // Prefer shell accounting-period FinYear (VB-style). Context alone picks
+        // latest unlocked year (e.g. 2027-28) and hides older FY data.
+        this.finYear = this.readStoredFinYear() || ctx.finYear;
         this.salesEntryDate = this.toInputDate(new Date());
         this.loading.set(false);
       },
@@ -147,6 +153,7 @@ export class SalesInvoiceComponent implements OnInit, OnDestroy {
         if (err?.status !== 401) {
           this.toast.error('Unable to load sales invoice context. Is the API running?');
         }
+        this.finYear = this.readStoredFinYear() || this.finYear;
         this.loading.set(false);
       },
     });
@@ -404,7 +411,68 @@ export class SalesInvoiceComponent implements OnInit, OnDestroy {
     });
   }
 
+  /** VB enztb_ClickPreview → opens A4 invoice in a new browser tab (CUSTOMER COPY). */
+  onPreview(): void {
+    if (!this.salesEntryId || this.isEditable) {
+      this.toast.error('Save / load a sales invoice before preview.');
+      return;
+    }
+    const lines = this.lines.filter((l) => l.fgId && (l.noOfPacks ?? 0) > 0);
+    if (lines.length === 0) {
+      this.toast.error('Commercial Invoice — CUSTOMER COPY cannot be printed.');
+      return;
+    }
+
+    const session = this.auth.getSession();
+    const printedBy = (
+      session?.fullName ||
+      session?.userName ||
+      session?.userId ||
+      'USER'
+    ).toUpperCase();
+
+    writeInvoicePrintCache({
+      salesEntryId: this.salesEntryId,
+      finYear: this.finYear,
+      printedBy,
+      cachedAt: new Date().toISOString(),
+      invoice: {
+        finYear: this.finYear,
+        billType: 'SI',
+        salesEntryType: this.salesEntryType || 'BG',
+        salesEntryId: this.salesEntryId,
+        salesEntryDate: this.salesEntryDate,
+        vehicleRegNo: this.vehicleRegNo,
+        customerId: this.customerCode || null,
+        customerName: this.customerName || null,
+        address: this.address || null,
+        distShop: this.distShop || null,
+        salesPromotion: this.salesPromotion,
+        deliveredTo: this.deliveredTo || 'N/A',
+        stockLocationId: null,
+        totalExcStValue: this.totalValue,
+        totalVatValue: this.totalVat,
+        netAmount: this.netValue,
+        totalWeightInTons: this.totalWeight,
+        checked: this.checked,
+        authorized: this.authorized,
+        lines: lines.map((l) => ({ ...l })),
+      },
+    });
+
+    const finYear = encodeURIComponent(this.finYear);
+    const autoPrint = this.exportToPdf ? '1' : '0';
+    const url = `/print/invoice/${this.salesEntryId}?finYear=${finYear}&autoPrint=${autoPrint}`;
+    const win = window.open(url, '_blank');
+    if (!win) {
+      this.toast.error('Pop-up blocked. Allow pop-ups for invoice preview.');
+      return;
+    }
+    win.focus();
+  }
+
   openFind(): void {
+    this.syncFinYearFromShell();
     this.findOpen = true;
     this.findSearch = '';
     this.findSearchField = 'siNo';
@@ -423,18 +491,21 @@ export class SalesInvoiceComponent implements OnInit, OnDestroy {
   }
 
   loadFind(): void {
+    this.syncFinYearFromShell();
     if (!this.finYear) {
       return;
     }
-    const period = this.readAccountingPeriodDates();
+    const periodMeta = this.readAccountingPeriodMeta();
+    // Full financial year: FinYear filter is enough (VB). Date range only for sub-periods.
+    const applyDates = !!periodMeta?.start && !!periodMeta?.end && !periodMeta.isFullYear;
     const params: SalesInvoiceSearchParams = {
       finYear: this.finYear,
       search: this.findSearch,
       searchField: this.findSearchField,
       sortOn: this.findSortOn,
       sortFlag: this.findSortFlag,
-      periodStart: period?.start,
-      periodEnd: period?.end,
+      periodStart: applyDates ? periodMeta!.start : undefined,
+      periodEnd: applyDates ? periodMeta!.end : undefined,
       take: 500,
     };
 
@@ -568,7 +639,7 @@ export class SalesInvoiceComponent implements OnInit, OnDestroy {
       return;
     }
     this.customerLookupAnchor = target.tagName === 'INPUT' ? target : (this.customerCodeInput?.nativeElement ?? target);
-    // Cursor in field → open full LOV immediately (type to filter)
+    // Cursor in field â†’ open full LOV immediately (type to filter)
     this.openCustomerLookup('');
   }
 
@@ -684,7 +755,7 @@ export class SalesInvoiceComponent implements OnInit, OnDestroy {
     if (target instanceof HTMLElement) {
       this.fgLookupAnchor = target.tagName === 'INPUT' ? target : target;
     }
-    // Cursor in field → open full FG list immediately
+    // Cursor in field â†’ open full FG list immediately
     this.openFgLookup('');
   }
 
@@ -905,7 +976,7 @@ export class SalesInvoiceComponent implements OnInit, OnDestroy {
     const rowAttr = current.getAttribute('data-row');
     const rowIndex = rowAttr != null ? Number(rowAttr) : -1;
 
-    // VB grid Advance: last editable cell of last complete row → new row
+    // VB grid Advance: last editable cell of last complete row â†’ new row
     if (field === 'vat' && rowIndex >= 0 && this.tryAdvanceNewRowLikeVb(rowIndex)) {
       return;
     }
@@ -976,6 +1047,7 @@ export class SalesInvoiceComponent implements OnInit, OnDestroy {
   private applyInvoice(inv: {
     salesEntryId: number;
     salesEntryDate: string;
+    salesEntryType?: string;
     vehicleRegNo: string;
     customerId: string | null;
     customerName: string | null;
@@ -992,6 +1064,7 @@ export class SalesInvoiceComponent implements OnInit, OnDestroy {
     lines: SalesInvoiceLine[];
   }): void {
     this.salesEntryId = inv.salesEntryId;
+    this.salesEntryType = inv.salesEntryType?.trim() || 'BG';
     this.salesEntryDate = this.toInputDate(new Date(inv.salesEntryDate));
     this.vehicleRegNo = inv.vehicleRegNo ?? '';
     this.customerCode = inv.customerId ?? '';
@@ -1309,7 +1382,32 @@ export class SalesInvoiceComponent implements OnInit, OnDestroy {
     this.userCanCheck = rows.some((p) => p.canCheck);
   }
 
-  private readAccountingPeriodDates(): { start: string; end: string } | null {
+  private syncFinYearFromShell(): void {
+    const stored = this.readStoredFinYear();
+    if (stored) {
+      this.finYear = stored;
+    }
+  }
+
+  private readStoredFinYear(): string | null {
+    try {
+      const raw = sessionStorage.getItem(PERIOD_STORAGE_KEY);
+      if (!raw) {
+        return null;
+      }
+      const saved = JSON.parse(raw) as { finYear?: string };
+      const fy = (saved.finYear || '').trim();
+      return fy || null;
+    } catch {
+      return null;
+    }
+  }
+
+  private readAccountingPeriodMeta(): {
+    start: string;
+    end: string;
+    isFullYear: boolean;
+  } | null {
     try {
       const raw = sessionStorage.getItem(PERIOD_STORAGE_KEY);
       if (!raw) {
@@ -1317,18 +1415,23 @@ export class SalesInvoiceComponent implements OnInit, OnDestroy {
       }
       const saved = JSON.parse(raw) as { periodLabel?: string };
       const label = saved.periodLabel ?? '';
+      const isFullYear = /full\s+financial\s+year/i.test(label);
       const match = label.match(
-        /\((\d{2}\s+\w{3}\s+\d{4})\s*[–-]\s*(\d{2}\s+\w{3}\s+\d{4})\)/,
+        /\((\d{2}\s+\w{3}\s+\d{4})\s*[\u2013\u2014-]\s*(\d{2}\s+\w{3}\s+\d{4})\)/,
       );
       if (!match) {
-        return null;
+        return isFullYear ? { start: '', end: '', isFullYear: true } : null;
       }
       const start = this.parseUkDate(match[1]);
       const end = this.parseUkDate(match[2]);
       if (!start || !end) {
-        return null;
+        return isFullYear ? { start: '', end: '', isFullYear: true } : null;
       }
-      return { start: this.toInputDate(start), end: this.toInputDate(end) };
+      return {
+        start: this.toInputDate(start),
+        end: this.toInputDate(end),
+        isFullYear,
+      };
     } catch {
       return null;
     }

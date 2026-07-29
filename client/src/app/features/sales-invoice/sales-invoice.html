@@ -274,7 +274,12 @@
               <fe-icon name="find"></fe-icon>
               <span>Find</span>
             </button>
-            <button type="button" class="si__btn" disabled>
+            <button
+              type="button"
+              class="si__btn"
+              (click)="onPreview()"
+              [disabled]="isEditable || !salesEntryId"
+            >
               <fe-icon name="preview"></fe-icon>
               <span>Preview</span>
             </button>
@@ -309,6 +314,7 @@
   <div class="si-find__panel" (click)="$event.stopPropagation()" tabindex="-1">
     <header class="si-find__header">
       <h3>List of Values — Sales Invoice</h3>
+      <p class="si-find__fy">Fin Year: {{ finYear || '—' }}</p>
     </header>
 
     <div class="si-find__filters">
