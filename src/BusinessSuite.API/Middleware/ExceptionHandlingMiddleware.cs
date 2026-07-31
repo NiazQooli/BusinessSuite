@@ -27,16 +27,42 @@ public class ExceptionHandlingMiddleware
         {
             await _next(context);
         }
+        catch (Exception ex) when (IsClientAbort(ex, context))
+        {
+            // Find/search often aborts prior HTTP calls when filters change — not a server fault.
+            _logger.LogDebug(ex, "Request aborted by client: {Path}", context.Request.Path);
+        }
         catch (Exception ex)
         {
             await HandleExceptionAsync(context, ex);
         }
     }
 
+    private static bool IsClientAbort(Exception exception, HttpContext context)
+    {
+        if (!context.RequestAborted.IsCancellationRequested)
+        {
+            return false;
+        }
+
+        return exception is OperationCanceledException or TaskCanceledException
+            || exception.GetBaseException() is OperationCanceledException or TaskCanceledException;
+    }
+
     private async Task HandleExceptionAsync(HttpContext context, Exception exception)
     {
+        // If response already started / client gone, skip writing problem details.
+        if (context.RequestAborted.IsCancellationRequested || context.Response.HasStarted)
+        {
+            return;
+        }
+
         var (statusCode, title, errors) = exception switch
         {
+            OperationCanceledException or TaskCanceledException => (
+                499,
+                "Request Canceled",
+                new Dictionary<string, string[]> { ["error"] = new[] { "The request was canceled." } }),
             ValidationException validationException => (
                 (int)HttpStatusCode.BadRequest,
                 "Validation Error",
@@ -71,7 +97,7 @@ public class ExceptionHandlingMiddleware
         {
             _logger.LogError(exception, "Unhandled exception");
         }
-        else
+        else if (statusCode != 499)
         {
             _logger.LogWarning(exception, "Handled exception: {Title}", title);
         }

@@ -13,8 +13,9 @@ import {
   signal,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Subject, Subscription } from 'rxjs';
-import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
+import { Subject, Subscription, of, EMPTY } from 'rxjs';
+import { catchError, debounceTime, finalize, switchMap, tap } from 'rxjs/operators';
+import { HttpErrorResponse } from '@angular/common/http';
 import { SalesInvoiceService } from '../../core/services/sales-invoice.service';
 import {
   CustomerLookup,
@@ -33,7 +34,14 @@ import { FeIconComponent } from '../../shared/icon/fe-icon';
 
 const PERIOD_STORAGE_KEY = 'fresher.accountingPeriod';
 
-type FindSearchField = 'siType' | 'siNo' | 'siDate' | 'code' | 'customerName' | 'deliveredTo';
+type FindSearchField =
+  | 'all'
+  | 'siType'
+  | 'siNo'
+  | 'siDate'
+  | 'code'
+  | 'customerName'
+  | 'deliveredTo';
 type FindEntryStatus = 'unchecked' | 'unposted' | 'posted';
 type FindSortOn = 'authorized' | 'checked';
 
@@ -65,9 +73,8 @@ export class SalesInvoiceComponent implements OnInit, OnDestroy {
   private customerSearchSub?: Subscription;
   private fgSearchSub?: Subscription;
   private prefetchSub?: Subscription;
-  private findSearchSub?: Subscription;
   private findSearchDebounceSub?: Subscription;
-  private readonly findSearchText$ = new Subject<string>();
+  private readonly findTrigger$ = new Subject<void>();
 
   @ViewChild('salesEntryDateInput') salesEntryDateInput?: ElementRef<HTMLInputElement>;
   @ViewChild('deliveredToInput') deliveredToInput?: ElementRef<HTMLInputElement>;
@@ -116,7 +123,7 @@ export class SalesInvoiceComponent implements OnInit, OnDestroy {
   // Find panel (VB frmSftSearch — Sales Invoice)
   findOpen = false;
   findSearch = '';
-  findSearchField: FindSearchField = 'siNo';
+  findSearchField: FindSearchField = 'all';
   findEntryStatus: FindEntryStatus = 'unposted';
   findResults: SalesInvoiceListItem[] = [];
   findHighlight = 0;
@@ -125,6 +132,7 @@ export class SalesInvoiceComponent implements OnInit, OnDestroy {
   userCanCheck = false;
 
   readonly findSearchFields: { id: FindSearchField; label: string }[] = [
+    { id: 'all', label: 'ALL FIELDS' },
     { id: 'siType', label: 'S.I TYPE' },
     { id: 'siNo', label: 'S.I NO.' },
     { id: 'siDate', label: 'S.I DATE' },
@@ -166,21 +174,20 @@ export class SalesInvoiceComponent implements OnInit, OnDestroy {
       },
     });
 
-    this.findSearchDebounceSub = this.findSearchText$
-      .pipe(debounceTime(220), distinctUntilChanged())
-      .subscribe((term) => {
-        this.findSearch = term;
-        this.loadFind();
-      });
+    this.findSearchDebounceSub = this.findTrigger$
+      .pipe(
+        debounceTime(280),
+        switchMap(() => this.runFindSearch()),
+      )
+      .subscribe();
   }
 
   ngOnDestroy(): void {
     this.customerSearchSub?.unsubscribe();
     this.fgSearchSub?.unsubscribe();
     this.prefetchSub?.unsubscribe();
-    this.findSearchSub?.unsubscribe();
     this.findSearchDebounceSub?.unsubscribe();
-    this.findSearchText$.complete();
+    this.findTrigger$.complete();
   }
 
   get findSortOn(): FindSortOn {
@@ -475,7 +482,7 @@ export class SalesInvoiceComponent implements OnInit, OnDestroy {
     this.syncFinYearFromShell();
     this.findOpen = true;
     this.findSearch = '';
-    this.findSearchField = 'siNo';
+    this.findSearchField = 'all';
     this.findEntryStatus = this.userCanPost ? 'unposted' : 'unchecked';
     this.findHighlight = 0;
     this.findResults = [];
@@ -483,7 +490,8 @@ export class SalesInvoiceComponent implements OnInit, OnDestroy {
   }
 
   onFindSearchText(term: string): void {
-    this.findSearchText$.next(term ?? '');
+    this.findSearch = term ?? '';
+    this.loadFind();
   }
 
   onFindFilterChange(): void {
@@ -495,12 +503,18 @@ export class SalesInvoiceComponent implements OnInit, OnDestroy {
     if (!this.finYear) {
       return;
     }
+    this.findLoading = true;
+    this.cdr.detectChanges();
+    this.findTrigger$.next();
+  }
+
+  /** Debounced + switchMap Find query (cancels prior in-flight search cleanly). */
+  private runFindSearch() {
     const periodMeta = this.readAccountingPeriodMeta();
-    // Full financial year: FinYear filter is enough (VB). Date range only for sub-periods.
     const applyDates = !!periodMeta?.start && !!periodMeta?.end && !periodMeta.isFullYear;
     const params: SalesInvoiceSearchParams = {
       finYear: this.finYear,
-      search: this.findSearch,
+      search: this.findSearch?.trim() || undefined,
       searchField: this.findSearchField,
       sortOn: this.findSortOn,
       sortFlag: this.findSortFlag,
@@ -509,29 +523,30 @@ export class SalesInvoiceComponent implements OnInit, OnDestroy {
       take: 500,
     };
 
-    this.findLoading = true;
-    this.cdr.detectChanges();
-
-    this.findSearchSub?.unsubscribe();
-    this.findSearchSub = this.api.search(params).subscribe({
-      next: (rows) => {
+    return this.api.search(params).pipe(
+      tap((rows) => {
         this.findResults = rows;
         this.findHighlight = rows.length ? 0 : -1;
-        this.findLoading = false;
         this.cdr.detectChanges();
-      },
-      error: () => {
+      }),
+      catchError((err: unknown) => {
+        if (err instanceof HttpErrorResponse && (err.status === 0 || err.status === 499)) {
+          return EMPTY;
+        }
         this.findResults = [];
         this.findHighlight = -1;
-        this.findLoading = false;
         this.cdr.detectChanges();
         this.toast.error('Unable to load find list.');
-      },
-    });
+        return of([]);
+      }),
+      finalize(() => {
+        this.findLoading = false;
+        this.cdr.detectChanges();
+      }),
+    );
   }
 
   closeFind(): void {
-    this.findSearchSub?.unsubscribe();
     this.findOpen = false;
     this.findLoading = false;
   }

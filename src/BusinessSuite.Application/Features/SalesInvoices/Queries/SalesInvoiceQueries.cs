@@ -69,9 +69,7 @@ public class SearchSalesInvoicesQueryHandler
                   && se.FinYear == request.FinYear
                   && se.BillType == "SI"
                   && se.SalesEntryType == "BG"
-                  && (se.Is19LtrInvoice == "N"
-                      || se.Is19LtrInvoice == null
-                      || se.Is19LtrInvoice == "")
+                  && se.Is19LtrInvoice != "Y"
             select new { se, cust };
 
         if (request.PeriodStart.HasValue)
@@ -98,75 +96,123 @@ public class SearchSalesInvoicesQueryHandler
         if (!string.IsNullOrWhiteSpace(request.Search))
         {
             var term = request.Search.Trim();
-            var termLower = term.ToLowerInvariant();
-            var field = request.SearchField?.Trim().ToLowerInvariant() ?? "sino";
+            var field = request.SearchField?.Trim().ToLowerInvariant() ?? "all";
+            var like = $"%{EscapeLike(term)}%";
+            var parsedDay = TryParseSearchDate(term);
 
             switch (field)
             {
                 case "sitype":
-                    query = query.Where(x =>
-                        x.se.SalesEntryType.ToLower().Contains(termLower));
+                    query = query.Where(x => EF.Functions.Like(x.se.SalesEntryType, like));
                     break;
                 case "sino":
-                    if (int.TryParse(term, out var id))
-                    {
-                        query = query.Where(x => x.se.SalesEntryId == id);
-                    }
-                    else
-                    {
-                        query = query.Where(x => x.se.SalesEntryId.ToString().Contains(term));
-                    }
+                    query = query.Where(x => x.se.SalesEntryId.ToString().Contains(term));
                     break;
                 case "sidate":
-                    if (DateTime.TryParse(term, out var dt))
+                    if (parsedDay.HasValue)
                     {
-                        var day = dt.Date;
+                        var day = parsedDay.Value;
                         query = query.Where(x => x.se.SalesEntryDate == day);
                     }
                     break;
                 case "code":
                     query = query.Where(x =>
-                        x.se.CustomerId != null && x.se.CustomerId.ToLower().Contains(termLower));
+                        x.se.CustomerId != null && EF.Functions.Like(x.se.CustomerId, like));
                     break;
                 case "customername":
                     query = query.Where(x =>
-                        x.cust != null && x.cust.CustomerCoName.ToLower().Contains(termLower));
+                        x.cust != null && EF.Functions.Like(x.cust.CustomerCoName, like));
                     break;
                 case "deliveredto":
-                    query = query.Where(x => x.se.DeliveredTo.ToLower().Contains(termLower));
+                    query = query.Where(x => EF.Functions.Like(x.se.DeliveredTo, like));
                     break;
+                case "all":
                 default:
                     query = query.Where(x =>
                         x.se.SalesEntryId.ToString().Contains(term)
-                        || (x.se.CustomerId != null && x.se.CustomerId.ToLower().Contains(termLower))
-                        || (x.cust != null && x.cust.CustomerCoName.ToLower().Contains(termLower))
-                        || x.se.DeliveredTo.ToLower().Contains(termLower)
-                        || x.se.VehicleRegNo.ToLower().Contains(termLower));
+                        || (x.se.CustomerId != null && EF.Functions.Like(x.se.CustomerId, like))
+                        || (x.cust != null && EF.Functions.Like(x.cust.CustomerCoName, like))
+                        || EF.Functions.Like(x.se.DeliveredTo, like)
+                        || EF.Functions.Like(x.se.VehicleRegNo, like)
+                        || EF.Functions.Like(x.se.SalesEntryType, like)
+                        || (parsedDay.HasValue && x.se.SalesEntryDate == parsedDay.Value));
                     break;
             }
         }
 
-        return await query
-            .OrderByDescending(x => x.se.SalesEntryDate)
-            .ThenByDescending(x => x.se.SalesEntryId)
-            .Take(take)
-            .Select(x => new SalesInvoiceListItemDto(
-                x.se.SalesEntryType,
-                x.se.SalesEntryId,
-                x.se.SalesEntryDate,
-                x.se.VehicleRegNo,
-                x.se.CustomerId,
-                x.cust != null ? x.cust.CustomerCoName : null,
-                x.cust != null ? x.cust.Address : null,
-                x.se.DeliveredTo,
-                x.se.NetAmount,
-                x.se.TotalWeightInTons,
-                x.se.TotalExcStValue,
-                x.se.TotalVatValue,
-                x.se.Checked,
-                x.se.Authorized,
-                x.cust != null && x.cust.IsDistShop == "Y" ? "DIST. SHOP" : "-"))
-            .ToListAsync(cancellationToken);
+        try
+        {
+            return await query
+                .OrderByDescending(x => x.se.SalesEntryDate)
+                .ThenByDescending(x => x.se.SalesEntryId)
+                .Take(take)
+                .Select(x => new SalesInvoiceListItemDto(
+                    x.se.SalesEntryType,
+                    x.se.SalesEntryId,
+                    x.se.SalesEntryDate,
+                    x.se.VehicleRegNo,
+                    x.se.CustomerId,
+                    x.cust != null ? x.cust.CustomerCoName : null,
+                    x.cust != null ? x.cust.Address : null,
+                    x.se.DeliveredTo,
+                    x.se.NetAmount,
+                    x.se.TotalWeightInTons,
+                    x.se.TotalExcStValue,
+                    x.se.TotalVatValue,
+                    x.se.Checked,
+                    x.se.Authorized,
+                    x.cust != null && x.cust.IsDistShop == "Y" ? "DIST. SHOP" : "-"))
+                .ToListAsync(cancellationToken);
+        }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+        {
+            // Client canceled (e.g. Find filter changed) — return empty, not a server error.
+            return Array.Empty<SalesInvoiceListItemDto>();
+        }
+    }
+
+    private static string EscapeLike(string value) =>
+        value
+            .Replace("[", "[[]", StringComparison.Ordinal)
+            .Replace("%", "[%]", StringComparison.Ordinal)
+            .Replace("_", "[_]", StringComparison.Ordinal);
+
+    /// <summary>
+    /// Accepts VB-style dates: dd/MM/yyyy, dd-MM-yyyy, yyyy-MM-dd, and culture parse fallback.
+    /// </summary>
+    private static DateTime? TryParseSearchDate(string term)
+    {
+        var formats = new[]
+        {
+            "dd/MM/yyyy",
+            "d/M/yyyy",
+            "dd-MM-yyyy",
+            "d-M-yyyy",
+            "yyyy-MM-dd",
+            "dd/MM/yy",
+            "d/M/yy",
+        };
+
+        if (DateTime.TryParseExact(
+                term,
+                formats,
+                System.Globalization.CultureInfo.InvariantCulture,
+                System.Globalization.DateTimeStyles.None,
+                out var exact))
+        {
+            return exact.Date;
+        }
+
+        if (DateTime.TryParse(
+                term,
+                System.Globalization.CultureInfo.GetCultureInfo("en-GB"),
+                System.Globalization.DateTimeStyles.None,
+                out var uk))
+        {
+            return uk.Date;
+        }
+
+        return null;
     }
 }
 
