@@ -165,15 +165,17 @@ export class ShellComponent implements OnInit {
   applyPeriod(): void {
     this.finYear = this.selectedFinYear;
     this.periodLabel = this.selectedPeriod;
-    sessionStorage.setItem(
+    localStorage.setItem(
       PERIOD_KEY,
       JSON.stringify({ finYear: this.finYear, periodLabel: this.periodLabel }),
     );
+    // Clear old session copy so it cannot override on next load.
+    sessionStorage.removeItem(PERIOD_KEY);
     this.periodModalOpen.set(false);
   }
 
   private restorePeriod(): void {
-    const raw = sessionStorage.getItem(PERIOD_KEY);
+    const raw = localStorage.getItem(PERIOD_KEY) ?? sessionStorage.getItem(PERIOD_KEY);
     if (!raw) {
       return;
     }
@@ -187,6 +189,9 @@ export class ShellComponent implements OnInit {
         this.periodLabel = saved.periodLabel;
         this.selectedPeriod = saved.periodLabel;
       }
+      // Migrate session → local so it survives browser restart.
+      localStorage.setItem(PERIOD_KEY, raw);
+      sessionStorage.removeItem(PERIOD_KEY);
     } catch {
       /* ignore */
     }
@@ -198,7 +203,9 @@ export class ShellComponent implements OnInit {
     }
     this.salesInvoiceApi.getContext().subscribe({
       next: (ctx) => {
-        if (!sessionStorage.getItem(PERIOD_KEY) && ctx.finYear) {
+        const hasSaved =
+          !!localStorage.getItem(PERIOD_KEY) || !!sessionStorage.getItem(PERIOD_KEY);
+        if (!hasSaved && ctx.finYear) {
           this.finYear = ctx.finYear;
           this.selectedFinYear = ctx.finYear;
           const match = this.financialYearOptions.find((o) => o.value === ctx.finYear);

@@ -1406,7 +1406,8 @@ export class SalesInvoiceComponent implements OnInit, OnDestroy {
 
   private readStoredFinYear(): string | null {
     try {
-      const raw = sessionStorage.getItem(PERIOD_STORAGE_KEY);
+      const raw =
+        localStorage.getItem(PERIOD_STORAGE_KEY) ?? sessionStorage.getItem(PERIOD_STORAGE_KEY);
       if (!raw) {
         return null;
       }
@@ -1424,7 +1425,8 @@ export class SalesInvoiceComponent implements OnInit, OnDestroy {
     isFullYear: boolean;
   } | null {
     try {
-      const raw = sessionStorage.getItem(PERIOD_STORAGE_KEY);
+      const raw =
+        localStorage.getItem(PERIOD_STORAGE_KEY) ?? sessionStorage.getItem(PERIOD_STORAGE_KEY);
       if (!raw) {
         return null;
       }
