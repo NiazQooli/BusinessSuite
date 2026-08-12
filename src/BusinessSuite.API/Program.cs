@@ -38,7 +38,12 @@ try
         });
     }
 
-    app.UseHttpsRedirection();
+    // Behind Nginx we terminate SSL at the proxy; Kestrel listens HTTP on localhost only.
+    if (!app.Environment.IsProduction())
+    {
+        app.UseHttpsRedirection();
+    }
+
     app.UseCors("AngularClient");
     app.UseAuthentication();
     app.UseAuthorization();

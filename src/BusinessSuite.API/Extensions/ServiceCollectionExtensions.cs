@@ -52,7 +52,8 @@ public static class ServiceCollectionExtensions
             {
                 policy.WithOrigins(
                         "http://localhost:4200",
-                        "https://localhost:4200")
+                        "https://localhost:4200",
+                        "https://app.fresheressentials.com")
                     .AllowAnyHeader()
                     .AllowAnyMethod();
             });
