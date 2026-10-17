@@ -19,4 +19,7 @@ public interface IApplicationDbContext
     DbSet<SftFinancialYearCompany> SftFinancialYearCompanies { get; }
 
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
+
+    /// <summary>Legacy INSERT/DELETE helpers for tables with many NOT NULL columns.</summary>
+    Task<int> ExecuteSqlAsync(FormattableString sql, CancellationToken cancellationToken = default);
 }

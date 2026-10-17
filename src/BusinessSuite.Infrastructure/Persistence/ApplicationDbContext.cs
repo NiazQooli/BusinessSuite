@@ -53,4 +53,7 @@ public class ApplicationDbContext : DbContext, IApplicationDbContext
 
         return await base.SaveChangesAsync(cancellationToken);
     }
+
+    public Task<int> ExecuteSqlAsync(FormattableString sql, CancellationToken cancellationToken = default)
+        => Database.ExecuteSqlInterpolatedAsync(sql, cancellationToken);
 }

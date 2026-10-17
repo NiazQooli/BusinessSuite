@@ -50,10 +50,21 @@ public static class ServiceCollectionExtensions
         {
             options.AddPolicy("AngularClient", policy =>
             {
-                policy.WithOrigins(
-                        "http://localhost:4200",
-                        "https://localhost:4200",
-                        "https://app.fresheressentials.com")
+                // ng serve may pick a random port when 4200 is busy (e.g. 46603).
+                policy.SetIsOriginAllowed(static origin =>
+                    {
+                        if (origin == "https://app.fresheressentials.com")
+                        {
+                            return true;
+                        }
+
+                        if (!Uri.TryCreate(origin, UriKind.Absolute, out var uri))
+                        {
+                            return false;
+                        }
+
+                        return uri.Host is "localhost" or "127.0.0.1";
+                    })
                     .AllowAnyHeader()
                     .AllowAnyMethod();
             });

@@ -4,6 +4,8 @@
     <TargetFramework>net10.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <!-- Match Angular Vite proxy (http://localhost:5011) -->
+    <LaunchProfileName>http</LaunchProfileName>
   </PropertyGroup>
 
   <ItemGroup>

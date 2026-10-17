@@ -1,71 +1,166 @@
-<section class="page">
-  <header class="page__header">
+<section class="cust">
+  <header class="cust__hero">
     <div>
-      <h1>Customers</h1>
-      <p>{{ totalCount() }} total records</p>
+      <h1>Customer Information <span class="cust__mode">[ {{ titleMode }} ]</span></h1>
+      <p class="cust__meta">{{ totalCount() }} total records</p>
     </div>
-    <input
-      class="search"
-      type="search"
-      placeholder="Search customers"
-      [ngModel]="search()"
-      (ngModelChange)="onSearch($event)"
-    />
+
+    <div class="cust__toolbar">
+      <button type="button" class="cust__btn" (click)="startNew()" [disabled]="isEditable || saving()">
+        New
+      </button>
+      <button
+        type="button"
+        class="cust__btn"
+        (click)="startEdit()"
+        [disabled]="isEditable || !selectedId() || saving()"
+      >
+        Edit
+      </button>
+      <button
+        type="button"
+        class="cust__btn cust__btn--primary"
+        (click)="save()"
+        [disabled]="!isEditable || saving()"
+      >
+        {{ saving() ? 'Saving…' : 'Save' }}
+      </button>
+      <button type="button" class="cust__btn" (click)="undo()" [disabled]="!isEditable || saving()">
+        Undo
+      </button>
+      <button
+        type="button"
+        class="cust__btn cust__btn--danger"
+        (click)="delete()"
+        [disabled]="isEditable || !selectedId() || saving()"
+      >
+        Delete
+      </button>
+    </div>
   </header>
 
-  <form class="create" (ngSubmit)="createCustomer()">
-    <h2>Add customer</h2>
-    <div class="create__grid">
-      <input [(ngModel)]="name" name="name" placeholder="Name" required />
-      <input [(ngModel)]="email" name="email" type="email" placeholder="Email" required />
-      <input [(ngModel)]="phone" name="phone" placeholder="Phone" />
-      <input [(ngModel)]="companyName" name="companyName" placeholder="Company" />
-      <button type="submit">Create</button>
-    </div>
-  </form>
+  <div class="cust__layout" [class.is-busy]="loading() || saving()">
+    <aside class="cust__list-panel">
+      <form class="cust__search" (ngSubmit)="onSearch()">
+        <input
+          type="search"
+          placeholder="Type to search code, name, phone, address…"
+          [ngModel]="searchText"
+          (ngModelChange)="onSearchInput($event)"
+          name="searchText"
+          [disabled]="isEditable"
+          autocomplete="off"
+        />
+        <button type="submit" class="cust__btn cust__btn--primary" [disabled]="isEditable">
+          Find
+        </button>
+      </form>
 
-  @if (error()) {
-    <p class="error">{{ error() }}</p>
-  }
+      <div class="cust__table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Code</th>
+              <th>Customer name</th>
+              <th>Phone 1</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (row of rows(); track row.customerId) {
+              <tr
+                [class.is-selected]="selectedId() === row.customerId"
+                (click)="selectRow(row)"
+              >
+                <td>{{ row.customerId }}</td>
+                <td>{{ row.customerCoName }}</td>
+                <td>{{ row.phone1 }}</td>
+                <td>
+                  <span class="cust__status" [class.is-inactive]="row.inactive">
+                    {{ row.inactive ? 'Inactive' : 'Active' }}
+                  </span>
+                </td>
+              </tr>
+            } @empty {
+              <tr>
+                <td colspan="4" class="cust__empty">
+                  {{ loading() ? 'Loading…' : 'No customers found.' }}
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </aside>
 
-  @if (loading()) {
-    <p class="muted">Loading customers…</p>
-  } @else {
-    <div class="table-wrap">
-      <table>
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Email</th>
-            <th>Company</th>
-            <th>Status</th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody>
-          @for (customer of customers(); track customer.id) {
-            <tr>
-              <td>{{ customer.name }}</td>
-              <td>{{ customer.email }}</td>
-              <td>{{ customer.companyName || '—' }}</td>
-              <td>
-                <span [class.active]="customer.isActive" [class.inactive]="!customer.isActive">
-                  {{ customer.isActive ? 'Active' : 'Inactive' }}
-                </span>
-              </td>
-              <td>
-                <button type="button" class="danger" (click)="deleteCustomer(customer.id)">
-                  Delete
-                </button>
-              </td>
-            </tr>
-          } @empty {
-            <tr>
-              <td colspan="5">No customers found.</td>
-            </tr>
-          }
-        </tbody>
-      </table>
-    </div>
-  }
+    <section class="cust__detail-panel">
+      <h2 class="cust__section-title">Customer details</h2>
+
+      <div class="cust__fields">
+        <label class="cust__field">
+          <span>Customer code</span>
+          <input [value]="form.customerId" readonly class="is-readonly" placeholder="Auto" />
+        </label>
+
+        <label class="cust__field cust__field--check">
+          <input type="checkbox" [(ngModel)]="form.inactive" name="inactive" [disabled]="!isEditable || mode() === 'add'" />
+          <span>Inactive</span>
+        </label>
+
+        <label class="cust__field cust__field--wide">
+          <span>Customer name *</span>
+          <input
+            #customerNameInput
+            [(ngModel)]="form.customerCoName"
+            name="customerCoName"
+            [disabled]="!isEditable"
+            maxlength="300"
+          />
+        </label>
+
+        <label class="cust__field">
+          <span>Short name</span>
+          <input
+            [(ngModel)]="form.customerShortName"
+            name="customerShortName"
+            [disabled]="!isEditable"
+            maxlength="50"
+          />
+        </label>
+
+        <label class="cust__field">
+          <span>Phone 1</span>
+          <input [(ngModel)]="form.phone1" name="phone1" [disabled]="!isEditable" maxlength="15" />
+        </label>
+        <label class="cust__field">
+          <span>Phone 2</span>
+          <input [(ngModel)]="form.phone2" name="phone2" [disabled]="!isEditable" maxlength="15" />
+        </label>
+        <label class="cust__field">
+          <span>Phone 3</span>
+          <input [(ngModel)]="form.phone3" name="phone3" [disabled]="!isEditable" maxlength="15" />
+        </label>
+
+        <label class="cust__field">
+          <span>Email</span>
+          <input [(ngModel)]="form.email" name="email" [disabled]="!isEditable" maxlength="75" />
+        </label>
+        <label class="cust__field">
+          <span>URL</span>
+          <input [(ngModel)]="form.url" name="url" [disabled]="!isEditable" maxlength="75" />
+        </label>
+
+        <label class="cust__field cust__field--full">
+          <span>Address *</span>
+          <textarea
+            [(ngModel)]="form.address"
+            name="address"
+            rows="3"
+            [disabled]="!isEditable"
+            maxlength="300"
+          ></textarea>
+        </label>
+      </div>
+    </section>
+  </div>
 </section>

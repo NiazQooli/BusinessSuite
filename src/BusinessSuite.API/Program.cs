@@ -38,11 +38,9 @@ try
         });
     }
 
-    // Behind Nginx we terminate SSL at the proxy; Kestrel listens HTTP on localhost only.
-    if (!app.Environment.IsProduction())
-    {
-        app.UseHttpsRedirection();
-    }
+    // Production: SSL terminates at Nginx; Kestrel stays HTTP.
+    // Development: do not redirect HTTP→HTTPS — Angular Vite proxy uses http://localhost:5011
+    // and HTTPS redirect causes proxy ECONNRESET.
 
     app.UseCors("AngularClient");
     app.UseAuthentication();

@@ -4,22 +4,6 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace BusinessSuite.Infrastructure.Persistence.Configurations;
 
-public class SalCustomerInfoConfiguration : IEntityTypeConfiguration<SalCustomerInfo>
-{
-    public void Configure(EntityTypeBuilder<SalCustomerInfo> builder)
-    {
-        builder.ToTable("tblSalCustomerInfo", t => t.ExcludeFromMigrations());
-        builder.HasKey(e => new { e.CompanyId, e.CustomerId });
-
-        builder.Property(e => e.CompanyId).HasColumnName("CompanyID").HasColumnType("tinyint");
-        builder.Property(e => e.CustomerId).HasColumnName("CustomerID").HasMaxLength(40).IsRequired();
-        builder.Property(e => e.CustomerCoName).HasMaxLength(300).IsRequired();
-        builder.Property(e => e.Address).HasMaxLength(500);
-        builder.Property(e => e.DiscCategory).HasMaxLength(50);
-        builder.Property(e => e.IsDistShop).HasMaxLength(1);
-    }
-}
-
 public class InvItemFgConfiguration : IEntityTypeConfiguration<InvItemFg>
 {
     public void Configure(EntityTypeBuilder<InvItemFg> builder)
